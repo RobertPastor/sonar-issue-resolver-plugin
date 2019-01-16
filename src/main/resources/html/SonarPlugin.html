@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+	 <meta charset="UTF-8"> 
+			<script type="text/javascript">
+				
+				document.addEventListener("DOMContentLoaded", function(event) {
+					//do work
+					console.log('document is loaded');
+					
+					var actionsTable = document.createElement("actionsTable");
+					actionsTable.style.border  = "thin dotted black";
+					
+					var trOne = document.createElement('tr');
+					
+					const textSize = "12px";
+					
+					// --- first td
+					var tdHeadActionExport = document.createElement('td');
+					tdHeadActionExport.style.backgroundColor = "yellow";
+					var divHeadActionExport = document.createElement('div');
+					var headActionExport = document.createTextNode("export issue data of issues that have been confirmed, reopened or resolved.");
+
+					divHeadActionExport.style.fontSize = textSize;
+					divHeadActionExport.style.fontWeight = "normal";
+					divHeadActionExport.style.border = "thin dotted blue";
+					
+					divHeadActionExport.appendChild(headActionExport);
+					tdHeadActionExport.appendChild(divHeadActionExport);
+					trOne.appendChild(tdHeadActionExport);
+					
+					// --- second td
+					var tdHeadActionImport = document.createElement('td');
+					tdHeadActionImport.style.backgroundColor = "yellow";
+
+					var divHeadActionImport = document.createElement('div');
+					var headActionImport = document.createTextNode("import issue data and transition issues that are matching a set of criteria");
+
+					divHeadActionImport.style.fontSize = textSize;
+					divHeadActionImport.style.fontWeight = "normal";
+					divHeadActionImport.style.border = "thin dotted blue";
+					
+					divHeadActionImport.appendChild(headActionImport);
+					tdHeadActionImport.appendChild(divHeadActionImport);
+					trOne.appendChild(tdHeadActionImport);
+					
+					// ----- third td
+					var tdHeadActionUpdate = document.createElement('td');
+					tdHeadActionUpdate.style.backgroundColor = "yellow";
+
+					var divHeadActionUpdate = document.createElement('div');
+					var headActionUpdate = document.createTextNode("update in a target project issue data and transition issues that are matching a set of criteria");
+
+					divHeadActionUpdate.style.fontSize = textSize;
+					divHeadActionUpdate.style.fontWeight = "normal";
+					divHeadActionUpdate.style.border = "thin dotted blue";
+					
+					divHeadActionUpdate.appendChild(headActionUpdate);
+					tdHeadActionUpdate.appendChild(divHeadActionUpdate);
+					trOne.appendChild(tdHeadActionUpdate);
+					
+					actionsTable.appendChild(trOne);
+					
+					//----------- second row with the links
+					var trTwo = document.createElement('tr');
+					
+					var tdActionExport = document.createElement('td');
+					var divActionExport = document.createElement('div');
+					divActionExport.appendChild(document.createTextNode("Export"));
+					
+					divActionExport.style.fontSize = textSize;
+					divActionExport.style.fontWeight = "normal";
+					divActionExport.style.border = "thin dotted red";
+					
+					tdActionExport.appendChild(divActionExport);
+					trTwo.appendChild(tdActionExport);
+					
+					var tdActionImport = document.createElement('td');
+					var divActionImport = document.createElement('div');
+					divActionImport.appendChild(document.createTextNode("Import"));
+					
+					divActionImport.style.fontSize = textSize;
+					divActionImport.style.fontWeight = "normal";
+					divActionImport.style.border = "thin dotted red";
+
+					tdActionImport.appendChild(divActionImport);
+					trTwo.appendChild(tdActionImport);
+
+					var tdActionUpdate = document.createElement('td');
+					var divActionUpdate = document.createElement('div');
+					divActionUpdate.appendChild(document.createTextNode("Update"));
+					
+					divActionUpdate.style.fontSize = textSize;
+					divActionUpdate.style.fontWeight = "normal";
+					divActionUpdate.style.border = "thin dotted red";
+
+					tdActionUpdate.appendChild(divActionUpdate);
+					trTwo.appendChild(tdActionUpdate);
+		
+					actionsTable.appendChild(trTwo);
+		
+					var mainDiv = document.getElementById("mainDivId");
+					mainDiv.appendChild(actionsTable);
+					
+				});
+
+			</script>
+	</head>
+
+	<body>
+
+		<div id="mainDivId">
+		
+		</div>
+
+	</body>
+</html>
