@@ -20,7 +20,7 @@ public class ExportActionTest {
 		// Request
 		final MockRequest request = new MockRequest();
 		request.setParam("projectKey", "my-project-key");
-		request.setParam("target-branch", "my-branch");
+		request.setParam("branch", "my-branch");
 
 		// Local call (first page)
 		final Map<String, String> localRequestParamsToCheckPageOne = new HashMap<>();
@@ -36,14 +36,19 @@ public class ExportActionTest {
 		
 		// 14th January 2019 - add hash message creation date and severity
 		localRequestResponsePageOne
-				.addIssues(Issues.Issue.newBuilder().setKey("AVrdUwSCGyMCMhQpQjBw").setRule("xml:IllegalTabCheck")
+				.addIssues(Issues.Issue.newBuilder()
+						.setKey("AVrdUwSCGyMCMhQpQjBw").setRule("xml:IllegalTabCheck")
 						.setComponent("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:pom.xml")
-						.setTextRange(Common.TextRange.newBuilder().setStartLine(4).setStartOffset(0))
-						.setResolution("FALSE-POSITIVE").setStatus("RESOLVED")
-						.setHash("hash").setMessage("message").setCreationDate("14/01/2019").setSeverity(Severity.INFO));
+						.setHash("hash")
+						.setAssignee("admin")
+						.setTextRange(Common.TextRange.newBuilder().setStartLine(4).setStartOffset(63))
+						.setResolution("FALSE-POSITIVE")
+						.setStatus("RESOLVED")
+						.setMessage("message").setCreationDate("14/01/2019").setSeverity(Severity.INFO));
 		
 		localRequestResponsePageOne.addComponents(Issues.Component.newBuilder()
 				.setKey("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:pom.xml").setLongName("pom.xml"));
+		
 		request.mockLocalRequest("api/issues/search", localRequestParamsToCheckPageOne,
 				localRequestResponsePageOne.build().toByteArray());
 
@@ -59,11 +64,18 @@ public class ExportActionTest {
 		final Issues.SearchWsResponse.Builder localRequestResponsePageTwo = Issues.SearchWsResponse.newBuilder();
 		localRequestResponsePageTwo.setPaging(Common.Paging.newBuilder().setTotal(2).setPageIndex(2).setPageSize(1));
 		localRequestResponsePageTwo
-				.addIssues(Issues.Issue.newBuilder().setKey("AVrdUwS9GyMCMhQpQjBx").setRule("squid:S3776")
+				.addIssues(Issues.Issue.newBuilder()
+						.setKey("AVrdUwS9GyMCMhQpQjBx")
+						.setRule("squid:S3776")
 						.setComponent("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java")
+						.setHash("hash")
+						.setAssignee("admin")
 						.setTextRange(Common.TextRange.newBuilder().setStartLine(64).setStartOffset(16))
-						.setResolution("WONTFIX").setStatus("RESOLVED")
-						.setHash("hash").setMessage("message").setCreationDate("14/01/2019").setSeverity(Severity.INFO));
+						.setResolution("WONTFIX")
+						.setStatus("RESOLVED")
+						.setMessage("message")
+						.setCreationDate("14/01/2019")
+						.setSeverity(Severity.INFO));
 		
 		localRequestResponsePageTwo.addComponents(Issues.Component.newBuilder()
 				.setKey("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java")
@@ -84,8 +96,8 @@ public class ExportActionTest {
 		DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 		Assert.assertEquals(
 				"{\"version\":1,\"projectKey\":\"my-project-key\",\"exportDate\":\"" + df.format(new Date()) + "\",\"branch\":\"my-branch\",\"issues\":["
-				+ "{\"longName\":\"pom.xml\",\"rule\":\"xml:IllegalTabCheck\",\"line\":4,\"status\":\"RESOLVED\",\"resolution\":\"FALSE-POSITIVE\",\"assignee\":\"\",\"hash\":\"hash\",\"message\":\"message\",\"creationDate\":\"14/01/2019\",\"severity\":\"INFO\",\"comments\":[]},"
-				+ "{\"longName\":\"src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java\",\"rule\":\"squid:S3776\",\"line\":64,\"status\":\"RESOLVED\",\"resolution\":\"WONTFIX\",\"assignee\":\"\",\"hash\":\"hash\",\"message\":\"message\",\"creationDate\":\"14/01/2019\",\"severity\":\"INFO\",\"comments\":[]}"
+				+ "{\"longName\":\"pom.xml\",\"rule\":\"xml:IllegalTabCheck\",\"line\":0,\"hash\":\"hash\",\"message\":\"message\",\"status\":\"RESOLVED\",\"resolution\":\"FALSE-POSITIVE\",\"assignee\":\"admin\",\"creationDate\":\"14/01/2019\",\"severity\":\"INFO\",\"comments\":[]},"
+				+ "{\"longName\":\"src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java\",\"rule\":\"squid:S3776\",\"line\":0,\"hash\":\"hash\",\"message\":\"message\",\"status\":\"RESOLVED\",\"resolution\":\"WONTFIX\",\"assignee\":\"admin\",\"creationDate\":\"14/01/2019\",\"severity\":\"INFO\",\"comments\":[]}"
 				+ "]}",
 				result);
 	}

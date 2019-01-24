@@ -29,7 +29,7 @@ public class IssueResolverWebServiceTest {
 		Assert.assertTrue(exportAction.handler() instanceof ExportAction);
 		Assert.assertEquals(2, exportAction.params().size());
 		Assert.assertNotNull(exportAction.param("projectKey"));
-		Assert.assertNotNull(exportAction.param("target-branch"));
+		Assert.assertNotNull(exportAction.param("branch"));
 
 		// Import
 		Action importAction = controller.action("import");
@@ -52,13 +52,14 @@ public class IssueResolverWebServiceTest {
 		Assert.assertNotNull(updateAction);
 		Assert.assertTrue(updateAction.handler() instanceof UpdateAction);
 		
-		// 14 January 2019 - moved 5 params to 6 params - adding target-branch
-		Assert.assertEquals(6, updateAction.params().size());
+		// 14 January 2019 - changed to 7 params - adding from-branch and to-branch
+		Assert.assertEquals(7, updateAction.params().size());
 		Assert.assertNotNull(updateAction.param("fromProjectKey"));
 		Assert.assertNotNull(updateAction.param("projectKey"));
 		
 		// 14 January 2019 - moved 5 params to 6 params - adding target-branch
-		Assert.assertNotNull(updateAction.param("target-branch"));
+		Assert.assertNotNull(updateAction.param("fromProject-branch"));
+		Assert.assertNotNull(updateAction.param("toProject-branch"));
 		
 		Assert.assertNotNull(updateAction.param("preview"));
 		Assert.assertNotNull(updateAction.param("skipAssign"));

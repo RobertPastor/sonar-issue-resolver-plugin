@@ -1,6 +1,5 @@
 package nl.futureedge.sonar.plugin.issueresolver.ws;
 
-import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,7 +31,7 @@ public class ExportAction implements IssueResolverWsAction {
 	public static final String PARAM_PROJECT_KEY = "projectKey";
 	
 	// 14 January 2019 - target-branch - name of the input in the web page
-	public static final String PARAM_TARGET_BRANCH = "target-branch";
+	public static final String PARAM_BRANCH = "branch";
 
 	private static final Logger LOGGER = Loggers.get(ExportAction.class);
 	
@@ -63,7 +62,7 @@ public class ExportAction implements IssueResolverWsAction {
 		action.createParam(PARAM_PROJECT_KEY).setDescription("Project to export issues from")
 				.setExampleValue("my-project").setRequired(true);
 		
-		action.createParam(PARAM_TARGET_BRANCH).setDescription("Branch to export issues from")
+		action.createParam(PARAM_BRANCH).setDescription("Branch to export issues from")
 				.setExampleValue("my-branch").setRequired(true);
 		
 		LOGGER.debug("Export action defined");
@@ -79,19 +78,48 @@ public class ExportAction implements IssueResolverWsAction {
 		// header of the response
 		response.setHeader("Content-Disposition", "attachment; filename=\"resolved-issues.json\"");
 
-		final JsonWriter responseWriter = response.newJsonWriter();
-		writeStart(responseWriter, request.mandatoryParam(PARAM_PROJECT_KEY), request.param(PARAM_TARGET_BRANCH));
-
-		IssueHelper.forEachIssue(request.localConnector(),
-				SearchHelper.findIssuesForExport(request.mandatoryParam(PARAM_PROJECT_KEY) , request.param(PARAM_TARGET_BRANCH) ), (searchIssuesResponse,
-						issue) -> writeIssue(responseWriter, issue, searchIssuesResponse.getComponentsList()));
-
-		writeEnd(responseWriter);
-		responseWriter.close();
+		try {
+			
+			JsonWriter responseWriter = response.newJsonWriter();
+			// see tabExport.js - project key and branch parameters are always provided.
+			writeStart(responseWriter, request.mandatoryParam(PARAM_PROJECT_KEY), request.mandatoryParam(PARAM_BRANCH));
+			
+			// write JSON start of issues array
+			writeBeginIssuesArray(responseWriter);
+			
+			IssueHelper.forEachIssue(request.localConnector(),
+						SearchHelper.findIssuesForExport(request.mandatoryParam(PARAM_PROJECT_KEY) , request.mandatoryParam(PARAM_BRANCH) ), (searchIssuesResponse,
+								issue) -> writeIssue(responseWriter, issue, searchIssuesResponse.getComponentsList()));
+			
+			// finish the JSON object
+			writeEnd(responseWriter);
+			responseWriter.close();
+			
+		} catch ( Exception e) {
+			
+			JsonWriter responseWriter = response.newJsonWriter();
+			
+			// see tabExport.js - project key and branch parameters are always provided.
+			writeStart(responseWriter, request.mandatoryParam(PARAM_PROJECT_KEY), request.mandatoryParam(PARAM_BRANCH));
+			
+			LOGGER.info("Error while searching for issues " + e.getLocalizedMessage());
+			
+			responseWriter.prop("error", e.getLocalizedMessage());
+			responseWriter.endObject();
+			responseWriter.close();
+		}
 		LOGGER.debug("Issue Resolver export request done");
+	}
+	
+	private void writeBeginIssuesArray(final JsonWriter writer) {
+		
+		writer.name("issues");
+		writer.beginArray();
+		
 	}
 
 	private void writeStart(final JsonWriter writer, String projectKey, String projectBranch) {
+		
 		writer.beginObject();
 		writer.prop("version", 1);
 		writer.prop("projectKey", projectKey);
@@ -99,9 +127,10 @@ public class ExportAction implements IssueResolverWsAction {
 		writer.prop("exportDate", df.format(new Date()));
 		if (projectBranch.length()>0) {
 			writer.prop("branch", projectBranch);
+		} else {
+			writer.prop("branch", "master");
 		}
-		writer.name("issues");
-		writer.beginArray();
+		
 	}
 
 	private void writeIssue(final JsonWriter writer, final Issue issue, List<Component> components) {

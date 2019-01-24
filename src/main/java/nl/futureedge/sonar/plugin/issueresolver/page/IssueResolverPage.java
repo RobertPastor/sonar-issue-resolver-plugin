@@ -13,6 +13,7 @@ public final class IssueResolverPage implements PageDefinition {
 
 	@Override
 	public void define(final Context context) {
+		// entrypoint.js in src main resources static
 		final Page issueresolverPage = Page.builder("issueresolver/entrypoint").setName("Issue Resolver")
 				.setScope(Scope.COMPONENT).setComponentQualifiers(Qualifier.PROJECT).setAdmin(true).build();
 		context.addPage(issueresolverPage);

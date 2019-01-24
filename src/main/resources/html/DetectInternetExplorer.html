@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+	 <meta charset="UTF-8"> 
+			<script type="text/javascript">
+				
+				document.addEventListener("DOMContentLoaded", function(event) {
+					//do work
+					console.log('document is loaded');
+							
+					var nAgt = window.navigator.userAgent;
+					var browserName  = window.navigator.appName;
+					var browserIsInternetExplorer = false;
+
+					// In Opera, the true version is after "Opera" or after "Version"
+					if ( nAgt.indexOf("Opera") != -1 ) {
+					   browserName = "Opera";
+					}
+					
+					// In MSIE, the true version is after "MSIE" in userAgent
+					if ( ( (verOffset = nAgt.indexOf("MSIE"))!=-1) || ( nAgt.match(/Trident/)  ) ) {
+					   browserName = "Microsoft Internet Explorer";
+					   browserIsInternetExplorer = true;
+					}
+					
+					// In Chrome, the true version is after "Chrome" 
+					if ((verOffset=nAgt.indexOf("Chrome"))!=-1) {
+					   browserName = "Chrome";
+					}
+					
+					// In Safari, the true version is after "Safari" or after "Version" 
+					if ((verOffset=nAgt.indexOf("Safari"))!=-1) {
+					   browserName = "Safari";
+					   
+					}
+					
+					// In Firefox, the true version is after "Firefox" 
+					if ((verOffset=nAgt.indexOf("Firefox"))!=-1) {
+						browserName = "Firefox";
+					}
+					alert ( browserName );
+
+				
+				});
+
+			</script>
+	</head>
+
+	<body>
+
+		<div id="mainDivId">
+		
+		</div>
+
+	</body>
+</html>

@@ -5,11 +5,11 @@
   <groupId>nl.future-edge.sonarqube.plugins</groupId>
   <artifactId>sonar-issueresolver-plugin</artifactId>
   <packaging>sonar-plugin</packaging>
-  <version>1.0.5-SNAPSHOT</version>
+  <version>1.0.6.001</version>
 
   <name>Issue resolver</name>
   <description>Export and import resolved issues (false-positive and won't fix) from SonarQube projects</description>
-  <url>https://github.com/willemsrb/sonar-issueresolver-plugin</url>
+  <url>https://github.com/RobertPastor/sonar-issue-resolver-plugin</url>
   <inceptionYear>2017</inceptionYear>
 
   <licenses>
@@ -22,7 +22,7 @@
   </licenses>
 
   <issueManagement>
-    <url>https://github.com/willemsrb/sonar-issueresolver-plugin/issues</url>
+    <url>https://github.com/RobertPastor/sonar-issue-resolver-plugin/issues</url>
   </issueManagement>
 
   <ciManagement>
@@ -30,8 +30,8 @@
   </ciManagement>
 
   <scm>
-    <url>https://github.com/willemsrb/sonar-issueresolver-plugin</url>
-    <connection>scm:git:https://github.com/willemsrb/sonar-issueresolver-plugin.git</connection>
+    <url>https://github.com/RobertPastor/sonar-issue-resolver-plugin</url>
+    <connection>scm:git:https://github.com/RobertPastor/sonar-issue-resolver-plugin.git</connection>
     <tag>HEAD</tag>
   </scm>
 
@@ -40,6 +40,11 @@
       <name>Robert Willems of Brilman</name>
       <url>https://github.com/willemsrb</url>
       <id>willemsrb</id>
+    </developer>
+    <developer>
+      <name>Robert PASTOR</name>
+      <url>https://github.com/RobertPastor</url>
+      <id>RobertPastor</id>
     </developer>
   </developers>
 
@@ -136,8 +141,8 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>${jdk.version}</source>
+          <target>${jdk.version}</target>
         </configuration>
       </plugin>
 

@@ -6,11 +6,15 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
 import org.sonarqube.ws.Common;
 import org.sonarqube.ws.Common.Severity;
 import org.sonarqube.ws.Issues;
 
 public class UpdateActionTest {
+	
+	private static final Logger LOGGER = Loggers.get(UpdateActionTest.class);
 
 	@Test
 	public void test() throws IOException {
@@ -18,9 +22,10 @@ public class UpdateActionTest {
 		final MockRequest request = new MockRequest();
 		request.setParam("fromProjectKey", "base-project-key");
 		request.setParam("projectKey", "my-project-key");
-		
+
 		// 14 January 2019 - target branch
-		request.setParam("target-branch", "release-IBB1");
+		request.setParam("fromProject-branch", "release-IBB1");
+		request.setParam("toProject-branch", "master");
 
 		request.setParam("preview", "false");
 		request.setParam("skipAssign", "false");
@@ -38,20 +43,33 @@ public class UpdateActionTest {
 
 		final Issues.SearchWsResponse.Builder localRequestBaseResponsePageOne = Issues.SearchWsResponse.newBuilder();
 		localRequestBaseResponsePageOne
-				.setPaging(Common.Paging.newBuilder().setTotal(3).setPageIndex(1).setPageSize(2));
-		localRequestBaseResponsePageOne
-				.addIssues(Issues.Issue.newBuilder().setKey("AVrdUwSCGyMCMhQpQjBw").setRule("xml:IllegalTabCheck")
-						.setComponent("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:pom.xml")
-						.setTextRange(Common.TextRange.newBuilder().setStartLine(4).setStartOffset(0))
-						.setResolution("FALSE-POSITIVE").setStatus("RESOLVED")
-						.setHash("hash").setMessage("message").setCreationDate("14/01/2019").setSeverity(Severity.INFO));
+		.setPaging(Common.Paging.newBuilder().setTotal(3).setPageIndex(1).setPageSize(2));
 
 		localRequestBaseResponsePageOne
-				.addIssues(Issues.Issue.newBuilder().setKey("AVrdUwSCGyMCMhQpQjBq").setRule("xml:IllegalTabCheck")
-						.setComponent("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:pom.xml")
-						.setTextRange(Common.TextRange.newBuilder().setStartLine(7).setStartOffset(0))
-						.setResolution("FALSE-POSITIVE").setStatus("RESOLVED")
-						.setHash("hash").setMessage("message").setCreationDate("14/01/2019").setSeverity(Severity.INFO));
+		.addIssues(Issues.Issue.newBuilder()
+				.setKey("AVrdUwSCGyMCMhQpQjBw")
+				.setRule("xml:IllegalTabCheck")
+				.setComponent("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:pom.xml")
+				.setHash("hash")
+				.setTextRange(Common.TextRange.newBuilder().setStartLine(4).setStartOffset(0))
+				.setResolution("FALSE-POSITIVE")
+				.setStatus("RESOLVED")
+				.setMessage("message")
+				.setCreationDate("14/01/2019")
+				.setSeverity(Severity.INFO)	);
+
+		localRequestBaseResponsePageOne
+		.addIssues(Issues.Issue.newBuilder()
+				.setKey("AVrdUwSCGyMCMhQpQjBq")
+				.setRule("xml:IllegalTabCheck")
+				.setComponent("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:pom.xml")
+				.setHash("hash")
+				.setTextRange(Common.TextRange.newBuilder().setStartLine(7).setStartOffset(0))
+				.setResolution("FALSE-POSITIVE")
+				.setStatus("RESOLVED")
+				.setMessage("message")
+				.setCreationDate("14/01/2019")
+				.setSeverity(Severity.INFO));
 
 		localRequestBaseResponsePageOne.addComponents(Issues.Component.newBuilder()
 				.setKey("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:pom.xml").setLongName("pom.xml"));
@@ -70,19 +88,27 @@ public class UpdateActionTest {
 		localRequestBaseParamsToCheckPageTwo.put("ps", "2");
 
 		final Issues.SearchWsResponse.Builder localRequestBaseResponsePageTwo = Issues.SearchWsResponse.newBuilder();
+
 		localRequestBaseResponsePageTwo
-				.setPaging(Common.Paging.newBuilder().setTotal(3).setPageIndex(2).setPageSize(2));
+		.setPaging(Common.Paging.newBuilder().setTotal(3).setPageIndex(2).setPageSize(2));
+
 		localRequestBaseResponsePageTwo
-				.addIssues(Issues.Issue.newBuilder().setKey("AVrdUwS9GyMCMhQpQjBx").setRule("squid:S3776")
-						.setComponent(
-								"nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java")
-						.setTextRange(Common.TextRange.newBuilder().setStartLine(64).setStartOffset(16))
-						.setResolution("WONTFIX").setStatus("RESOLVED")
-						.setHash("hash").setMessage("message").setCreationDate("14/01/2019").setSeverity(Severity.INFO));
-				
+		.addIssues(Issues.Issue.newBuilder()
+				.setKey("AVrdUwS9GyMCMhQpQjBx")
+				.setRule("squid:S3776")
+				.setComponent("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java")
+				.setHash("hash")
+				.setTextRange(Common.TextRange.newBuilder().setStartLine(64).setStartOffset(16))
+				.setResolution("WONTFIX")
+				.setStatus("RESOLVED")
+				.setMessage("message")
+				.setCreationDate("14/01/2019")
+				.setSeverity(Severity.INFO));
+
 		localRequestBaseResponsePageTwo.addComponents(Issues.Component.newBuilder()
 				.setKey("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java")
 				.setLongName("src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java"));
+
 		request.mockLocalRequest("api/issues/search", localRequestBaseParamsToCheckPageTwo,
 				localRequestBaseResponsePageTwo.build().toByteArray());
 
@@ -96,17 +122,22 @@ public class UpdateActionTest {
 
 		final Issues.SearchWsResponse.Builder localRequestResponsePageOne = Issues.SearchWsResponse.newBuilder();
 		localRequestResponsePageOne.setPaging(Common.Paging.newBuilder().setTotal(3).setPageIndex(1).setPageSize(2));
-		localRequestResponsePageOne
-				.addIssues(Issues.Issue.newBuilder().setKey("TotaleAndereKey1").setRule("xml:IllegalTabCheck")
-						.setComponent("nl.future-edge.sonarqube.plugins:myBranch:sonar-issueresolver-plugin:pom.xml")
-						.setTextRange(Common.TextRange.newBuilder().setStartLine(4).setStartOffset(0))
-						.setResolution("FALSE-POSITIVE").setStatus("RESOLVED")
-						.setHash("hash").setMessage("message").setCreationDate("14/01/2019").setSeverity(Severity.INFO));
+		
+		localRequestResponsePageOne.addIssues(Issues.Issue.newBuilder().setKey("TotaleAndereKey1").setRule("xml:IllegalTabCheck")
+				.setComponent("nl.future-edge.sonarqube.plugins:myBranch:sonar-issueresolver-plugin:pom.xml")
+				.setHash("hash")
+				.setTextRange(Common.TextRange.newBuilder().setStartLine(4).setStartOffset(0))
+				.setResolution("FALSE-POSITIVE")
+				.setStatus("RESOLVED")
+				.setMessage("message")
+				.setCreationDate("14/01/2019")
+				.setSeverity(Severity.INFO));
 
 		localRequestResponsePageOne.addIssues(Issues.Issue.newBuilder().setKey("TotaleAndereKey1b")
 				.setRule("xml:IllegalTabCheck")
 				.setComponent("nl.future-edge.sonarqube.plugins:myBranch:sonar-issueresolver-plugin:pom.xml")
 				.setTextRange(Common.TextRange.newBuilder().setStartLine(14).setStartOffset(0)).setStatus("OPEN"));
+
 		localRequestResponsePageOne.addComponents(Issues.Component.newBuilder()
 				.setKey("nl.future-edge.sonarqube.plugins:myBranch:sonar-issueresolver-plugin:pom.xml")
 				.setLongName("pom.xml"));
@@ -123,20 +154,25 @@ public class UpdateActionTest {
 		localRequestParamsToCheckPageTwo.put("ps", "2");
 
 		final Issues.SearchWsResponse.Builder localRequestResponsePageTwo = Issues.SearchWsResponse.newBuilder();
+		// paging in the responses when querying sonar
 		localRequestResponsePageTwo.setPaging(Common.Paging.newBuilder().setTotal(2).setPageIndex(2).setPageSize(1));
-		localRequestResponsePageTwo
-				.addIssues(Issues.Issue.newBuilder().setKey("TotaleAndereKey2").setRule("squid:S3776")
-						.setComponent(
-								"nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:myBranch:src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java")
-						.setTextRange(Common.TextRange.newBuilder().setStartLine(64).setStartOffset(16))
-						.setComments(Issues.Comments.newBuilder()
-								.addComments(Issues.Comment.newBuilder().setMarkdown("Comment one")))
-						.setStatus("OPEN")
-						.setHash("hash").setMessage("message").setCreationDate("14/01/2019").setSeverity(Severity.INFO));
+		
+		localRequestResponsePageTwo.addIssues(Issues.Issue.newBuilder()
+				.setKey("TotaleAndereKey2")
+				.setRule("squid:S3776")
+				.setComponent("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:myBranch:src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java")
+				.setTextRange(Common.TextRange.newBuilder().setStartLine(64).setStartOffset(16))
+				.setHash("hash")
+				.setComments(Issues.Comments.newBuilder().addComments(Issues.Comment.newBuilder().setMarkdown("Comment one")))
+				.setStatus("OPEN")
+				.setMessage("message")
+				.setCreationDate("14/01/2019")
+				.setSeverity(Severity.INFO));
 
 		localRequestResponsePageTwo.addComponents(Issues.Component.newBuilder()
 				.setKey("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:myBranch:src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java")
 				.setLongName("src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java"));
+
 		request.mockLocalRequest("api/issues/search", localRequestParamsToCheckPageTwo,
 				localRequestResponsePageTwo.build().toByteArray());
 
@@ -164,12 +200,25 @@ public class UpdateActionTest {
 		// Execute
 		final UpdateAction subject = new UpdateAction();
 		subject.handle(request, response);
+		
+		LOGGER.debug(new String(response.result(), "UTF-8"));
 
 		// Validate
 		final String result = new String(response.result(), "UTF-8");
-		Assert.assertEquals("{\"preview\":false,\"issues\":3,\"duplicateKeys\":0,"
+		Assert.assertEquals("{" + "\"preview\":false,\"issues\":3,\"duplicateKeys\":0,"
 				+ "\"matchedIssues\":2,\"matchFailures\":[]," + "\"transitionedIssues\":1,\"transitionFailures\":[],"
-				+ "\"assignedIssues\":0,\"assignFailures\":[]," + "\"commentedIssues\":0,\"commentFailures\":[]}",
+				+ "\"assignedIssues\":0,\"assignFailures\":[]," + "\"commentedIssues\":0,\"commentFailures\":[],"
+				// 18 January 2019 - add matching issues
+				+ "\"matchingIssues\":[" 
+				+ "{\"longName\":\"pom.xml\",\"rule\":\"xml:IllegalTabCheck\",\"line\":0,\"hash\":\"hash\",\"message\":\"message\","
+				+ "\"status\":\"RESOLVED\",\"resolution\":\"FALSE-POSITIVE\",\"severity\":\"INFO\","
+				+ "\"transitioned\":false,\"assigned\":false,\"commented\":false"
+				+ "},"
+				+ "{\"longName\":\"src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java\",\"rule\":\"squid:S3776\",\"line\":0,\"hash\":\"hash\",\"message\":\"message\","
+				+ "\"status\":\"OPEN\",\"resolution\":\"\",\"severity\":\"INFO\","
+				+ "\"transitioned\":true,\"assigned\":false,\"commented\":false"
+				+ "}"
+				+ "]}",
 				result);
 	}
 }

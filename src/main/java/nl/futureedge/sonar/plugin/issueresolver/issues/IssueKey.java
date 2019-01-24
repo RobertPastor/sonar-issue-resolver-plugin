@@ -14,30 +14,42 @@ import nl.futureedge.sonar.plugin.issueresolver.json.JsonReader;
 /**
  * Issue key; used to match issues.
  */
-public final class IssueKey {
+public class IssueKey {
 
-	private static final String NAME_LONG_NAME = "longName";
-	private static final String NAME_RULE = "rule";
-	private static final String NAME_LINE = "line";
+	protected static final String NAME_LONG_NAME = "longName";
+	protected static final String NAME_RULE = "rule";
+	//17th January 2019 - use has instead of line
+	protected static final String NAME_LINE = "line";
+	protected static final String NAME_HASH = "hash";
+	protected static final String NAME_MESSAGE = "message";
 
-	private String longName;
-	private String rule;
-	private int line;
+	protected String longName;
+	protected String rule;
+	protected int line;
+	protected String hash;
+	protected String message;
 
 	/**
 	 * Constructor.
 	 * 
+	 * * @param longName = component
+	 *            longName
 	 * @param rule
 	 *            rule
-	 * @param component
-	 *            component
 	 * @param line
 	 *            line
+	 * @param hash
+	 *            hash
+	 * @param message
+	 *            message
 	 */
-	private IssueKey(final String longName, final String rule, final int line) {
+	public IssueKey(final String longName, final String rule, final int line, final String hash, final String message) {
+		
 		this.longName = longName;
 		this.rule = rule;
 		this.line = line;
+		this.hash = hash;
+		this.message = message;
 	}
 
 	/**
@@ -48,11 +60,16 @@ public final class IssueKey {
 	 * @return issue key
 	 */
 	public static IssueKey fromIssue(final Issue issue, List<Component> components) {
+		
 		final Component component = findComponent(components, issue.getComponent());
-		return new IssueKey(component.getLongName(), issue.getRule(), issue.getTextRange().getStartLine());
+		return new IssueKey(component.getLongName(), issue.getRule(), issue.getLine(), issue.getHash() , issue.getMessage());
+		
 	}
 
-	private static Component findComponent(final List<Component> components, final String key) {
+	/*
+	 * why is this method as no private attribute used
+	 */
+	protected static Component findComponent(final List<Component> components, final String key) {
 		for (final Component component : components) {
 			if (key.equals(component.getKey())) {
 				return component;
@@ -72,7 +89,11 @@ public final class IssueKey {
 	 *             IO errors in underlying json reader
 	 */
 	public static IssueKey read(final JsonReader reader) throws IOException {
-		return new IssueKey(reader.prop(NAME_LONG_NAME), reader.prop(NAME_RULE), reader.propAsInt(NAME_LINE));
+		return new IssueKey(reader.prop(NAME_LONG_NAME), 
+				reader.prop(NAME_RULE),
+				reader.propAsInt(NAME_LINE), 
+				reader.prop(NAME_HASH), 
+				reader.prop(NAME_MESSAGE));
 	}
 
 	/**
@@ -82,14 +103,20 @@ public final class IssueKey {
 	 *            json writer
 	 */
 	public void write(final JsonWriter writer) {
+		
+		// warning - order is important see IssueKeyTest
 		writer.prop(NAME_LONG_NAME, longName);
 		writer.prop(NAME_RULE, rule);
 		writer.prop(NAME_LINE, line);
+		writer.prop(NAME_HASH, hash);
+		writer.prop(NAME_MESSAGE, message);
+
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(17, 37).append(longName).append(rule).append(line).toHashCode();
+		return new HashCodeBuilder(17, 37).append(this.longName).append(this.rule).append(this.line).toHashCode();
+		
 	}
 
 	@Override
@@ -104,13 +131,20 @@ public final class IssueKey {
 			return false;
 		}
 		final IssueKey that = (IssueKey) obj;
-		return new EqualsBuilder().append(longName, that.longName).append(rule, that.rule).append(line, that.line)
+		// specific CASE for line = 0 or hash is empty
+		//if (  (this.line == 0) || (this.hash.length() == 0) ) {
+		//	return false;
+		//}
+		return new EqualsBuilder()
+				.append(this.longName, that.longName)
+				.append(this.rule, that.rule)
+				.append(this.line, that.line)
 				.isEquals();
 	}
 
 	@Override
 	public String toString() {
-		return "IssueKey [longName=" + longName + ", rule=" + rule + ", line=" + line + "]";
+		return "IssueKey [longName=" + this.longName + ", rule=" + this.rule + ", line=" + this.line + "]";
 	}
 
 }

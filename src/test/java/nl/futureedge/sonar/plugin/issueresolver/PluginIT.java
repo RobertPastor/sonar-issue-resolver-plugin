@@ -51,6 +51,8 @@ import com.sonar.orchestrator.build.MavenBuild;
 import com.sonar.orchestrator.container.Server;
 import com.sonar.orchestrator.locator.FileLocation;
 
+import java.io.UnsupportedEncodingException;
+
 import nl.futureedge.sonar.plugin.issueresolver.ws.ExportAction;
 import nl.futureedge.sonar.plugin.issueresolver.ws.ImportAction;
 import nl.futureedge.sonar.plugin.issueresolver.ws.IssueResolverWebService;
@@ -212,7 +214,7 @@ public class PluginIT {
 	}
 
 	private String importResolvedIssues(final String projectKey, final String data) {
-		// Cannot use query because we use the fileupload
+		// Cannot use query because we use the file-upload
 		LOGGER.info("Importing issues into project {}", projectKey);
 
 		// Use httpclient 4
@@ -258,9 +260,11 @@ public class PluginIT {
 	}
 
 	private String updateResolvedIssues(final String fromProjectKey, final String projectKey) {
+		
 		LOGGER.info("Updating issues from project {} to project {}", fromProjectKey, projectKey);
 		final UpdateQuery updateQuery = new UpdateQuery(fromProjectKey, projectKey);
 		return orchestrator.getServer().getAdminWsClient().getConnector().execute(updateQuery);
+		
 	}
 
 	/**
@@ -372,7 +376,7 @@ public class PluginIT {
 			final StringBuilder url = new StringBuilder(BASE_URL);
 			url.append('?');
 			appendUrlParameter(url, UpdateAction.PARAM_FROM_PROJECT_KEY, fromProjectKey);
-			appendUrlParameter(url, UpdateAction.PARAM_PROJECT_KEY, projectKey);
+			appendUrlParameter(url, UpdateAction.PARAM_TO_PROJECT_KEY, projectKey);
 			return url.toString();
 		}
 	}

@@ -20,7 +20,7 @@ public class IssueDataTest {
 	@Test
 	public void test() throws IOException {
 		final Issue issue = ReflectionTestUtils.build(Issue.class, "status_", "RESOLVED", "resolution_", "FALSE-POSITIVE",
-				"assignee_", "admin", "hash_", "hash", "message_", "message", "creationDate_", "14/01/2019", "severity_", Severity.INFO.getNumber(),
+				"assignee_", "admin", "line_", 63, "message_", "message", "creationDate_", "14/01/2019", "severity_", Severity.INFO.getNumber(),
 				"comments_",
 				ReflectionTestUtils.build(Comments.class, "comments_",
 						Arrays.asList(ReflectionTestUtils.build(Comment.class, "markdown_", "Comment one"),
@@ -30,9 +30,9 @@ public class IssueDataTest {
 		Assert.assertEquals("RESOLVED", data.getStatus());
 		Assert.assertEquals("FALSE-POSITIVE", data.getResolution());
 		Assert.assertEquals("admin", data.getAssignee());
-		// 14th January 2019 - export hash
-		Assert.assertEquals("hash", data.getHash());
-		Assert.assertEquals("message", data.getMessage());
+		// 14th January 2019 - line is now moved to Issue Data
+		//Assert.assertEquals(63, data.getLine());
+		//Assert.assertEquals("message", data.getMessage());
 		Assert.assertEquals("14/01/2019", data.getCreationDate());
 		Assert.assertEquals(Severity.INFO , data.getSeverity());
 		
@@ -48,7 +48,7 @@ public class IssueDataTest {
 
 			json = writer.toString();
 		}
-		Assert.assertEquals("{\"status\":\"RESOLVED\",\"resolution\":\"FALSE-POSITIVE\",\"assignee\":\"admin\",\"hash\":\"hash\",\"message\":\"message\",\"creationDate\":\"14/01/2019\",\"severity\":\"INFO\",\"comments\":[\"Comment one\",\"Comment two\"]}", json);
+		Assert.assertEquals("{\"status\":\"RESOLVED\",\"resolution\":\"FALSE-POSITIVE\",\"assignee\":\"admin\",\"creationDate\":\"14/01/2019\",\"severity\":\"INFO\",\"comments\":[\"Comment one\",\"Comment two\"]}", json);
 
 		final IssueData readData;
 		try (final ByteArrayInputStream bais = new ByteArrayInputStream(json.getBytes("UTF-8"));
@@ -62,8 +62,8 @@ public class IssueDataTest {
 		Assert.assertEquals("FALSE-POSITIVE", readData.getResolution());
 		Assert.assertEquals("admin", readData.getAssignee());
 		// 14th January 2019 - export hash
-		Assert.assertEquals("hash", readData.getHash());
-		Assert.assertEquals("message", readData.getMessage());
+		//Assert.assertEquals(63, readData.getLine());
+		//Assert.assertEquals("message", readData.getMessage());
 		Assert.assertEquals("14/01/2019", readData.getCreationDate());
 		Assert.assertEquals(Severity.INFO, readData.getSeverity());
 		

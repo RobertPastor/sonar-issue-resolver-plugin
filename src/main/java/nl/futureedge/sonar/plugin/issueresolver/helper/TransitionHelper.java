@@ -23,6 +23,7 @@ public final class TransitionHelper {
 
 	public static boolean noAction(final String currentStatus, final String currentResolution,
 			final String wantedStatus, final String wantedResolution) {
+		
 		return noActionStatus(currentStatus, wantedStatus) && noActionResolution(currentResolution, wantedResolution);
 	}
 

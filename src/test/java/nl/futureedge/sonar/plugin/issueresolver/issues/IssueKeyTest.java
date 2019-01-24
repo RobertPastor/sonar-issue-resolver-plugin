@@ -21,10 +21,12 @@ public class IssueKeyTest {
 	public void test() throws IOException {
 		final Issue issue = ReflectionTestUtils.build(Issue.class, "rule_", "test:rule001", "component_",
 				"nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java",
-				"textRange_", ReflectionTestUtils.build(TextRange.class, "startLine_", 13, "startOffset_", 65));
+				"textRange_", ReflectionTestUtils.build(TextRange.class, "startLine_", 13, "startOffset_", 65),
+				"hash_", "hash", "message_", "message");
 		
-		final Component component = ReflectionTestUtils.build(Component.class, "key_", "nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java",
-			"longName_", "src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java");
+		final Component component = ReflectionTestUtils.build(Component.class, 
+				"key_", "nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java",
+				"longName_", "src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java");
 		final List<Component> components = Arrays.asList(component);
 
 		final IssueKey key = IssueKey.fromIssue(issue, components);
@@ -32,7 +34,9 @@ public class IssueKeyTest {
 		final String json;
 		try (final StringWriter writer = new StringWriter()) {
 			final JsonWriter jsonWriter = JsonWriter.of(writer);
+			
 			jsonWriter.beginObject();
+			// Issue Key is writing file Path, rule, line, hash and message
 			key.write(jsonWriter);
 			jsonWriter.endObject();
 			jsonWriter.close();
@@ -40,7 +44,7 @@ public class IssueKeyTest {
 			json = writer.toString();
 		}
 		Assert.assertEquals(
-				"{\"longName\":\"src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java\",\"rule\":\"test:rule001\",\"line\":13}",
+				"{\"longName\":\"src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java\",\"rule\":\"test:rule001\",\"line\":0,\"hash\":\"hash\",\"message\":\"message\"}",
 				json);
 
 		final IssueKey readKey;

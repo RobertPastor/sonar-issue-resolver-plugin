@@ -25,10 +25,14 @@ import org.sonar.api.server.ws.LocalConnector.LocalRequest;
 import org.sonar.api.server.ws.LocalConnector.LocalResponse;
 import org.sonar.api.server.ws.Request;
 import org.sonar.api.server.ws.internal.PartImpl;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
 
 import com.google.common.collect.Maps;
 
 public class MockRequest extends Request {
+	
+	private static final Logger LOGGER = Loggers.get(MockRequest.class);
 
 	private final Map<String, String> params = Maps.newHashMap();
 	private final Map<String, Part> parts = Maps.newHashMap();
@@ -142,6 +146,9 @@ public class MockRequest extends Request {
 	}
 	public void validateNoMoreLocalRequests() {
 		for(Map.Entry<String,List<LocalRequestData>> localRequest : localRequests.entrySet()) {
+			
+			LOGGER.debug("validate No More Local Requests - key= " + localRequest.getKey() + " - is empty= " + localRequest.getValue().size());
+
 			Assert.assertTrue("Not all requests for " + localRequest.getKey() + " have been called" , localRequest.getValue().isEmpty());
 		}
 	}

@@ -21,10 +21,10 @@ public final class SearchHelper {
 	 * @return search request
 	 */
 	public static SearchWsRequest findIssuesForExport(final String projectKey, String branchName) {
+		
 		final SearchWsRequest searchIssuesRequest = new SearchWsRequest();
 		searchIssuesRequest.setProjectKeys(Collections.singletonList(projectKey));
 		searchIssuesRequest.setAdditionalFields(Collections.singletonList("comments"));
-		
 		
 		// 14 January 2019 - additional field for a branch
 		if (branchName.length()>0) {
