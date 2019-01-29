@@ -11,6 +11,9 @@ import org.sonarqube.ws.client.measure.ComponentTreeWsRequest;
  * Search functionality.
  */
 public final class SearchHelper {
+	
+	private final static int sonarIssuesSearchPageSize = 500;
+	private final static int sonarDirectoriesSearchPageSize = 500;
 
 	private SearchHelper() {
 	}
@@ -35,7 +38,7 @@ public final class SearchHelper {
 
 		searchIssuesRequest.setStatuses(Arrays.asList("CONFIRMED", "REOPENED", "RESOLVED"));
 		searchIssuesRequest.setPage(1);
-		searchIssuesRequest.setPageSize(100);
+		searchIssuesRequest.setPageSize(sonarIssuesSearchPageSize);
 		return searchIssuesRequest;
 	}
 
@@ -62,7 +65,7 @@ public final class SearchHelper {
 		}
 
 		searchIssuesRequest.setPage(1);
-		searchIssuesRequest.setPageSize(100);
+		searchIssuesRequest.setPageSize(sonarIssuesSearchPageSize);
 		return searchIssuesRequest;
 	}
 
@@ -84,7 +87,7 @@ public final class SearchHelper {
 		}
 
 		searchDirectoriesRequest.setPage(1);
-		searchDirectoriesRequest.setPageSize(100);
+		searchDirectoriesRequest.setPageSize(sonarDirectoriesSearchPageSize);
 		return searchDirectoriesRequest;	
 	}
 

@@ -23,7 +23,8 @@ public class IssueHelperTest {
 	private static final Logger LOGGER = Loggers.get(IssueHelperTest.class);
 
 	private int count = 0;
-
+	private final static int sonarIssuesSearchPageSize = 500;
+	
 	@Test
 	public void TenThousandIssues() throws IOException {
 
@@ -39,7 +40,7 @@ public class IssueHelperTest {
 		request.setParam("skipAssign", "false");
 		request.setParam("skipComments", "false");
 
-		int pageSize = 100;
+		int pageSize = sonarIssuesSearchPageSize;
 		int nbPages = 100;
 		int total = nbPages * pageSize;
 
@@ -60,6 +61,7 @@ public class IssueHelperTest {
 
 		int pageIndex = 1;
 		total = 100;
+		
 		// Response
 		localRequestResponsePageOne.setPaging(Common.Paging.newBuilder().setTotal(total).setPageIndex(pageIndex).setPageSize(pageSize));
 
@@ -103,7 +105,7 @@ public class IssueHelperTest {
 		});
 
 		LOGGER.debug("Number of Issues: {}", count);
-		Assert.assertEquals(100, count);
+		Assert.assertEquals(pageSize, count);
 
 	}
 }

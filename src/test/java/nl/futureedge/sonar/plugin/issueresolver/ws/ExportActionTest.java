@@ -19,6 +19,8 @@ public class ExportActionTest {
 	
 	private static final Logger LOGGER = Loggers.get(ExportActionTest.class);
 
+	private final static int sonarIssuesSearchPageSize = 500;
+
 	@Test
 	public void test() throws IOException {
 		
@@ -35,7 +37,7 @@ public class ExportActionTest {
 		//localRequestParamsToCheckPageOne.put("target-branch", "my-branch");
 		localRequestParamsToCheckPageOne.put("statuses", "CONFIRMED,REOPENED,RESOLVED");
 		localRequestParamsToCheckPageOne.put("p", "1");
-		localRequestParamsToCheckPageOne.put("ps", "100");
+		localRequestParamsToCheckPageOne.put("ps", String.valueOf(sonarIssuesSearchPageSize));
 
 		final Issues.SearchWsResponse.Builder localRequestResponsePageOne = Issues.SearchWsResponse.newBuilder();
 		localRequestResponsePageOne.setPaging(Common.Paging.newBuilder().setTotal(2).setPageIndex(1).setPageSize(1));

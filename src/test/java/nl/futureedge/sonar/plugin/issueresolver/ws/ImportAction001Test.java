@@ -21,6 +21,8 @@ public class ImportAction001Test {
 	
 	private static final Logger LOGGER = Loggers.get(ImportAction001Test.class);
 
+	private final static int sonarIssuesSearchPageSize = 500;
+
 	@Test
 	public void test() throws IOException {
 		// Request
@@ -43,7 +45,7 @@ public class ImportAction001Test {
 		localRequestParamsToCheckPageOne.put("projectKeys", "my-project-key");
 		localRequestParamsToCheckPageOne.put("additionalFields", "comments");
 		localRequestParamsToCheckPageOne.put("p", "1");
-		localRequestParamsToCheckPageOne.put("ps", "100");
+		localRequestParamsToCheckPageOne.put("ps", String.valueOf(sonarIssuesSearchPageSize));
 
 		final Issues.SearchWsResponse.Builder localRequestResponsePageOne = Issues.SearchWsResponse.newBuilder();
 		localRequestResponsePageOne.setPaging(Common.Paging.newBuilder().setTotal(9).setPageIndex(1).setPageSize(6));

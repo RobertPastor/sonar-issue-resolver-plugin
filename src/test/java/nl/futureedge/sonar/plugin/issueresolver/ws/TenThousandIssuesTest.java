@@ -18,7 +18,7 @@ public class TenThousandIssuesTest {
 
 	private static final Logger LOGGER = Loggers.get(TenThousandIssuesTest.class);
 
-
+	private final static int sonarIssuesSearchPageSize = 500;
 
 	@Test
 	public void TenThousandIssues() throws IOException {
@@ -46,7 +46,7 @@ public class TenThousandIssuesTest {
 		localRequestBaseParamsToCheckPageOne.put("statuses", "CONFIRMED,REOPENED,RESOLVED");
 		// page id and page size
 		localRequestBaseParamsToCheckPageOne.put("p", "1");
-		localRequestBaseParamsToCheckPageOne.put("ps", "100");
+		localRequestBaseParamsToCheckPageOne.put("ps", String.valueOf(sonarIssuesSearchPageSize));
 
 		//final Issues.SearchWsResponse.Builder localRequestBaseResponsePageOne = Issues.SearchWsResponse.newBuilder();
 		//localRequestBaseResponsePageOne.setPaging(Common.Paging.newBuilder().setTotal(3).setPageIndex(1).setPageSize(2));
@@ -55,7 +55,7 @@ public class TenThousandIssuesTest {
 		//Issues.SearchWsResponse.Builder builder = Issues.SearchWsResponse.newBuilder().setTotal(20000).setPs(100);
 
 		final Issues.SearchWsResponse.Builder localRequestResponsePageOne = Issues.SearchWsResponse.newBuilder();
-		localRequestResponsePageOne.setPaging(Common.Paging.newBuilder().setTotal(10001).setPageIndex(1).setPageSize(100));
+		localRequestResponsePageOne.setPaging(Common.Paging.newBuilder().setTotal(10001).setPageIndex(1).setPageSize(sonarIssuesSearchPageSize));
 		
 		localRequestResponsePageOne.addComponents(Issues.Component.newBuilder()
 				.setKey("nl.future-edge.sonarqube.plugins:myBranch:sonar-issueresolver-plugin:pom.xml")
@@ -74,14 +74,18 @@ public class TenThousandIssuesTest {
 		}
 
 		Issues.SearchWsResponse searchWsResponse = localRequestResponsePageOne.build();
-		//Issues.SearchWsResponse searchWsResponse = builder.build();
-		//for (int i = 0; i < 100; i++) {
+		/*
+		 * Issues.SearchWsResponse searchWsResponse = builder.build();
+		 */
+		/*
+		 * for (int i = 0; i < sonarIssuesSearchPageSize; i++) {
+		 */
 
 		//	MockResponse mockResponse = new MockResponse().setStatus(200).setBody(toBuffer(searchWsResponse));
 		//	mockResponse = mockResponse.setHeader("Content-Type", "application/x-protobuf");
 
 		//}
-		//MockResponse mockLastResponse = new MockResponse().setStatus(400).setBody("{\"errors\":[{\"msg\":\"Can return only the first 10000 results. 10100th result asked.\"}]}"));
+		//MockResponse mockLastResponse = new MockResponse().setStatus(400).setBody("{\"errors\":[{\"msg\":\"Can return only the first 10000 results. 10100th result asked.\"}]}");
 
 		request.mockLocalRequest("api/issues/search", localRequestBaseParamsToCheckPageOne, localRequestResponsePageOne.build().toByteArray());
 

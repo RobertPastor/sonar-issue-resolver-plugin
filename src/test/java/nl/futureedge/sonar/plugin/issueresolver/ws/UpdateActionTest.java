@@ -18,6 +18,8 @@ public class UpdateActionTest {
 	
 	private static final Logger LOGGER = Loggers.get(UpdateActionTest.class);
 
+	private final static int sonarIssuesSearchPageSize = 500;
+	
 	@Test
 	public void test() throws IOException {
 		
@@ -42,7 +44,7 @@ public class UpdateActionTest {
 		//localRequestBaseParamsToCheckPageOne.put("additionalFields", "hash");
 		localRequestBaseParamsToCheckPageOne.put("statuses", "CONFIRMED,REOPENED,RESOLVED");
 		localRequestBaseParamsToCheckPageOne.put("p", "1");
-		localRequestBaseParamsToCheckPageOne.put("ps", "100");
+		localRequestBaseParamsToCheckPageOne.put("ps", String.valueOf(sonarIssuesSearchPageSize));
 
 		final Issues.SearchWsResponse.Builder localRequestBaseResponsePageOne = Issues.SearchWsResponse.newBuilder();
 		// total of 3 issues , page size = 2 issues , current page index = 1
@@ -136,7 +138,7 @@ public class UpdateActionTest {
 		localRequestParamsToCheckPageOne.put("additionalFields", "comments");
 		//localRequestParamsToCheckPageOne.put("additionalFields", "branch");
 		localRequestParamsToCheckPageOne.put("p", "1");
-		localRequestParamsToCheckPageOne.put("ps", "100");
+		localRequestParamsToCheckPageOne.put("ps", String.valueOf(sonarIssuesSearchPageSize));
 
 		final Issues.SearchWsResponse.Builder localRequestResponsePageOne = Issues.SearchWsResponse.newBuilder();
 		localRequestResponsePageOne.setPaging(Common.Paging.newBuilder().setTotal(3).setPageIndex(1).setPageSize(2));
