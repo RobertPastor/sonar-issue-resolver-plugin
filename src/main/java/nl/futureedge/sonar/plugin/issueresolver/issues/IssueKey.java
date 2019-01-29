@@ -62,7 +62,7 @@ public class IssueKey {
 	public static IssueKey fromIssue(final Issue issue, List<Component> components) {
 		
 		final Component component = findComponent(components, issue.getComponent());
-		return new IssueKey(component.getLongName(), issue.getRule(), issue.getLine(), issue.getHash() , issue.getMessage());
+		return new IssueKey(component.getLongName(), issue.getRule(), issue.getTextRange().getStartLine(), issue.getHash() , issue.getMessage());
 		
 	}
 
@@ -89,7 +89,9 @@ public class IssueKey {
 	 *             IO errors in underlying json reader
 	 */
 	public static IssueKey read(final JsonReader reader) throws IOException {
-		return new IssueKey(reader.prop(NAME_LONG_NAME), 
+		return new IssueKey(
+				
+				reader.prop(NAME_LONG_NAME), 
 				reader.prop(NAME_RULE),
 				reader.propAsInt(NAME_LINE), 
 				reader.prop(NAME_HASH), 

@@ -12,7 +12,7 @@ function timedCount() {
         i = 1;
     }
     postMessage(String(i));
-    setTimeout("timedCount()", 100);
+    setTimeout("timedCount()", 500);
 }
 
 timedCount();

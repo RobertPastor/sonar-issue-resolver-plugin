@@ -9,18 +9,24 @@ import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
 import org.sonarqube.ws.Common;
 import org.sonarqube.ws.Common.Severity;
 import org.sonarqube.ws.Issues;
 
 public class ExportActionTest {
+	
+	private static final Logger LOGGER = Loggers.get(ExportActionTest.class);
 
 	@Test
 	public void test() throws IOException {
+		
 		// Request
 		final MockRequest request = new MockRequest();
 		request.setParam("projectKey", "my-project-key");
 		request.setParam("branch", "my-branch");
+		//request.setParam("tenThousand", "false");
 
 		// Local call (first page)
 		final Map<String, String> localRequestParamsToCheckPageOne = new HashMap<>();
@@ -39,12 +45,18 @@ public class ExportActionTest {
 				.addIssues(Issues.Issue.newBuilder()
 						.setKey("AVrdUwSCGyMCMhQpQjBw").setRule("xml:IllegalTabCheck")
 						.setComponent("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:pom.xml")
-						.setHash("hash")
-						.setAssignee("admin")
 						.setTextRange(Common.TextRange.newBuilder().setStartLine(4).setStartOffset(63))
+
+						.setHash("hash")
+						.setMessage("message")
+
 						.setResolution("FALSE-POSITIVE")
 						.setStatus("RESOLVED")
-						.setMessage("message").setCreationDate("14/01/2019").setSeverity(Severity.INFO));
+						.setSeverity(Severity.INFO)
+						
+						.setAssignee("admin")
+						.setCreationDate("14/01/2019")
+						);
 		
 		localRequestResponsePageOne.addComponents(Issues.Component.newBuilder()
 				.setKey("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:pom.xml").setLongName("pom.xml"));
@@ -68,14 +80,18 @@ public class ExportActionTest {
 						.setKey("AVrdUwS9GyMCMhQpQjBx")
 						.setRule("squid:S3776")
 						.setComponent("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java")
-						.setHash("hash")
-						.setAssignee("admin")
 						.setTextRange(Common.TextRange.newBuilder().setStartLine(64).setStartOffset(16))
+
+						.setHash("hash")
+						.setMessage("message")
+
 						.setResolution("WONTFIX")
 						.setStatus("RESOLVED")
-						.setMessage("message")
+						.setSeverity(Severity.INFO)
+						
+						.setAssignee("admin")
 						.setCreationDate("14/01/2019")
-						.setSeverity(Severity.INFO));
+						);
 		
 		localRequestResponsePageTwo.addComponents(Issues.Component.newBuilder()
 				.setKey("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java")
@@ -93,11 +109,14 @@ public class ExportActionTest {
 
 		// Validate
 		final String result = new String(response.result(), "UTF-8");
+		LOGGER.debug(result);
+		
 		DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
 		Assert.assertEquals(
 				"{\"version\":1,\"projectKey\":\"my-project-key\",\"exportDate\":\"" + df.format(new Date()) + "\",\"branch\":\"my-branch\",\"issues\":["
-				+ "{\"longName\":\"pom.xml\",\"rule\":\"xml:IllegalTabCheck\",\"line\":0,\"hash\":\"hash\",\"message\":\"message\",\"status\":\"RESOLVED\",\"resolution\":\"FALSE-POSITIVE\",\"assignee\":\"admin\",\"creationDate\":\"14/01/2019\",\"severity\":\"INFO\",\"comments\":[]},"
-				+ "{\"longName\":\"src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java\",\"rule\":\"squid:S3776\",\"line\":0,\"hash\":\"hash\",\"message\":\"message\",\"status\":\"RESOLVED\",\"resolution\":\"WONTFIX\",\"assignee\":\"admin\",\"creationDate\":\"14/01/2019\",\"severity\":\"INFO\",\"comments\":[]}"
+				+ "{\"longName\":\"pom.xml\",\"rule\":\"xml:IllegalTabCheck\",\"line\":4,\"hash\":\"hash\",\"message\":\"message\",\"status\":\"RESOLVED\",\"resolution\":\"FALSE-POSITIVE\",\"severity\":\"INFO\","
+				+ "\"assignee\":\"admin\",\"creationDate\":\"14/01/2019\",\"comments\":[]},"
+				+ "{\"longName\":\"src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java\",\"rule\":\"squid:S3776\",\"line\":64,\"hash\":\"hash\",\"message\":\"message\",\"status\":\"RESOLVED\",\"resolution\":\"WONTFIX\",\"severity\":\"INFO\",\"assignee\":\"admin\",\"creationDate\":\"14/01/2019\",\"comments\":[]}"
 				+ "]}",
 				result);
 	}

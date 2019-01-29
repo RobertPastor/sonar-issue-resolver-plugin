@@ -12,24 +12,24 @@ import org.sonarqube.ws.Issues.Issue;
 import nl.futureedge.sonar.plugin.issueresolver.json.JsonReader;
 
 public class IssueKeyExtension extends IssueKey {
-	
+
 	// transitioned has two meaning: in preview mode it means ready to transition, otherwise it means transitioned (done with response = 200)
 	private static final String NAME_transitioned = "transitioned";
 	private static final String NAME_assigned = "assigned";
 	private static final String NAME_commented = "commented";
-	
+
 	private static final String NAME_STATUS = "status";
 	private static final String NAME_RESOLUTION = "resolution";
 	private static final String NAME_SEVERITY = "severity";
-	
+
 	private boolean transitioned = false;
 	private boolean assigned = false;
 	private boolean commented = false;
-	
+
 	private String status = "";
 	private String resolution = "";
 	private final Severity severity;
-	
+
 
 	/**
 	 * Constructor 
@@ -42,19 +42,19 @@ public class IssueKeyExtension extends IssueKey {
 	 */
 	public IssueKeyExtension(final String longName, final String rule, final int line, 
 			final String hash, final String message, final String status, final String resolution, final Severity severity) {
-		
+
 		super(longName, rule, line, hash, message);
-		
+
 		this.transitioned = false;
 		this.assigned = false;
 		this.commented = false;
-		
+
 		this.status = status;
 		this.resolution = resolution;
 		this.severity = severity;
-		
+
 	}
-	
+
 	/**
 	 * Construct key from search.
 	 * 
@@ -63,12 +63,13 @@ public class IssueKeyExtension extends IssueKey {
 	 * @return issue key
 	 */
 	public static IssueKeyExtension fromIssue(final Issue issue, List<Component> components) {
-		
+
 		final Component component = findComponent(components, issue.getComponent());
-		return new IssueKeyExtension(component.getLongName(), issue.getRule(), issue.getLine(), issue.getHash() , issue.getMessage() , issue.getStatus() , issue.getResolution(), issue.getSeverity());
-		
+		return new IssueKeyExtension(component.getLongName(), issue.getRule(), issue.getTextRange().getStartLine() , 
+				issue.getHash() , issue.getMessage() , issue.getStatus() , issue.getResolution(), issue.getSeverity());
+
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
@@ -91,7 +92,7 @@ public class IssueKeyExtension extends IssueKey {
 				.append(this.line, that.line)
 				.isEquals();
 	}
-	
+
 	/**
 	 * Construct key from export data.
 	 * 
@@ -102,40 +103,50 @@ public class IssueKeyExtension extends IssueKey {
 	 *             IO errors in underlying json reader
 	 */
 	public static IssueKeyExtension read(final JsonReader reader) throws IOException {
-		return new IssueKeyExtension(reader.prop(NAME_LONG_NAME), 
+
+		// order of the tags must be the same as the writer
+		return new IssueKeyExtension(
+				
+				reader.prop(NAME_LONG_NAME), 
 				reader.prop(NAME_RULE),
 				reader.propAsInt(NAME_LINE), 
+				
 				reader.prop(NAME_HASH), 
 				reader.prop(NAME_MESSAGE),
+				
+				// from here writer of data
 				reader.prop(NAME_STATUS),
 				reader.prop(NAME_RESOLUTION),
 				Severity.valueOf(reader.prop(NAME_SEVERITY))
 				);
 	}
-	
+
 	/**
 	 * Write key to export data.
 	 * 
 	 * @param writer
 	 *            json writer
+	 * @param b 
 	 */
-	public void write(final JsonWriter writer) {
-		
+	public void write(final JsonWriter writer, boolean b) {
+
 		// warning - order is important see IssueKeyTest
-		
+
 		writer.prop(NAME_LONG_NAME, this.longName);
 		writer.prop(NAME_RULE, this.rule);
 		writer.prop(NAME_LINE, this.line);
 		writer.prop(NAME_HASH, this.hash);
 		writer.prop(NAME_MESSAGE, this.message);
-		
+
 		writer.prop(NAME_STATUS, this.status);
 		writer.prop(NAME_RESOLUTION, this.resolution);
 		writer.prop(NAME_SEVERITY, this.severity.name());
-		
-		writer.prop(NAME_transitioned, this.transitioned);
-		writer.prop(NAME_assigned, this.assigned);
-		writer.prop(NAME_commented, this.commented);
+
+		if (b) {
+			writer.prop(NAME_transitioned, this.transitioned);
+			writer.prop(NAME_assigned, this.assigned);
+			writer.prop(NAME_commented, this.commented);
+		}
 
 	}
 
@@ -180,5 +191,33 @@ public class IssueKeyExtension extends IssueKey {
 	public void setCommented(boolean commented) {
 		this.commented = commented;
 	}
-	
+
+	/**
+	 * @return the status
+	 */
+	public String getStatus() {
+		return status;
+	}
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	/**
+	 * @return the resolution
+	 */
+	public String getResolution() {
+		return resolution;
+	}
+
+	/**
+	 * @param resolution the resolution to set
+	 */
+	public void setResolution(String resolution) {
+		this.resolution = resolution;
+	}
+
 }

@@ -75,13 +75,14 @@ public final class ImportAction implements IssueResolverWsAction {
 		LOGGER.info("Handle issue Resolver import request ...");
 		final ImportResult importResult = new ImportResult();
 
-		// Read issue data from request
-		final Map<IssueKeyExtension, IssueData> issues;
+		// Read issue data from request- as contained in the JSON file
+		final Map<IssueKey, IssueData> sourceIssues;
+		
 		JsonWriter responseWriter;
 		try {
 			
-			// retrieve the issues as available in the input JSON file
-			issues = readIssues(request, importResult);
+			// retrieve the issues as available in the input JSON file -> source read only issues
+			sourceIssues = readIssues(request, importResult);
 			
 			LOGGER.info("Read " + importResult.getNbIssues() + " issues (having " + importResult.getDuplicateKeys() + " duplicate keys)");
 			
@@ -90,7 +91,7 @@ public final class ImportAction implements IssueResolverWsAction {
 					request.mandatoryParamAsBoolean(PARAM_PREVIEW), request.mandatoryParamAsBoolean(PARAM_SKIP_ASSIGN),
 					request.mandatoryParamAsBoolean(PARAM_SKIP_COMMENTS), request.mandatoryParam(PARAM_PROJECT_KEY),
 					request.mandatoryParam(PARAM_TARGET_BRANCH),
-					issues);
+					sourceIssues);
 
 			// Send result
 			responseWriter = response.newJsonWriter();
@@ -100,7 +101,7 @@ public final class ImportAction implements IssueResolverWsAction {
 			
 		} catch(IllegalStateException e) {
 			
-			LOGGER.info("Error while reading request parameters " + e.getLocalizedMessage());
+			LOGGER.info("Error while reading request parameters== " + e.getLocalizedMessage());
 			responseWriter = response.newJsonWriter();
 			responseWriter.beginObject();
 			responseWriter.prop("error", e.getLocalizedMessage());
@@ -115,30 +116,35 @@ public final class ImportAction implements IssueResolverWsAction {
 	/* ************** READ ************** */
 	/* ************** READ ************** */
 
-	private Map<IssueKeyExtension, IssueData> readIssues(final Request request, final ImportResult importResult)  {
+	private Map<IssueKey, IssueData> readIssues(final Request request, final ImportResult importResult)  {
 		
 		final Part data;
 		try {
+			LOGGER.info("reading mandatory data param");
 			data = request.mandatoryParamAsPart(PARAM_DATA);
 			if (data == null) {
-				LOGGER.info("Error while reading request parameters " + PARAM_DATA);
+				LOGGER.info("Error while reading request parameters= " + PARAM_DATA);
 				throw new IllegalStateException("Mandatory Parameters Import File is missing");
 			}
 		} catch(Exception e) {
-			LOGGER.info("Error while reading request parameters " + e.getLocalizedMessage());
+			LOGGER.info("Error while reading request parameters - exception= " + e.getLocalizedMessage());
 			throw new IllegalStateException("Mandatory Parameters Import File is missing");
 		}
 		
-		final Map<IssueKeyExtension, IssueData> issues;
+		final Map<IssueKey, IssueData> issues;
 
 		try (final JsonReader reader = new JsonReader(data.getInputStream())) {
+			
 			reader.beginObject();
 
 			final int constantCurrentVersion = 1;
 			// Version
 			final int version = reader.propAsInt("version");
+			LOGGER.debug("file structure version: " + version);
+			
 			switch (version) {
 			case constantCurrentVersion:
+				
 				// 14 January 2019 - Robert PASTOR - add project key
 				final String projectKey = reader.prop("projectKey");
 				LOGGER.debug("project Key: " + projectKey);
@@ -157,36 +163,54 @@ public final class ImportAction implements IssueResolverWsAction {
 			default:
 				throw new IllegalStateException("JSON header Error - Unknown version '" + version + "' - expected value was '" + constantCurrentVersion + "'");
 			}
+			
 			reader.endObject();
+			
 		} catch (IOException ex) {
 			throw new IllegalStateException("JSON Import - Unexpected error during data parse", ex);
 		}
 		return issues;
 	}
 
-	private Map<IssueKeyExtension, IssueData> readIssuesVersionOne(final JsonReader reader, final ImportResult importResult) throws IOException {
+	/**
+	 * read issues from a JSON reader
+	 * @param reader
+	 * @param importResult
+	 * @return
+	 * @throws IOException
+	 */
+	private Map<IssueKey, IssueData> readIssuesVersionOne(final JsonReader reader, final ImportResult importResult) throws IOException {
 		
-		final Map<IssueKeyExtension, IssueData> issues = new HashMap<IssueKeyExtension, IssueData>();
+		final Map<IssueKey, IssueData> issues = new HashMap<IssueKey, IssueData>();
 
-		reader.assertName("issues");
-		reader.beginArray();
-		while (reader.hasNext()) {
-			
-			reader.beginObject();
-			final IssueKeyExtension key = IssueKeyExtension.read(reader);
-			LOGGER.debug("Read issue: " + key);
-			final IssueData data = IssueData.read(reader);
-			importResult.registerIssue();
+		try {
+			LOGGER.debug("start reading all issues" );
+			reader.assertName("issues");
+			reader.beginArray();
+			while (reader.hasNext()) {
+				
+				reader.beginObject();
+				
+				final IssueKey key = IssueKey.read(reader);
+				LOGGER.debug("Read issue: " + key);
+				
+				final IssueData data = IssueData.read(reader);
+				importResult.registerIssue();
 
-			if (issues.containsKey(key)) {
-				importResult.registerDuplicateKey();
-			} else {
-				issues.put(key, data);
+				if (issues.containsKey(key)) {
+					importResult.registerDuplicateKey();
+				} else {
+					issues.put(key, data);
+				}
+				reader.endObject();
 			}
-			reader.endObject();
+			reader.endArray();
+			
+		}catch (IOException ex) {
+			LOGGER.error("Error during read Issues Version One", ex.getLocalizedMessage());
+			throw new IllegalStateException("JSON Import - Unexpected error during data read", ex);
 		}
-		reader.endArray();
-
+		
 		return issues;
 	}
 }

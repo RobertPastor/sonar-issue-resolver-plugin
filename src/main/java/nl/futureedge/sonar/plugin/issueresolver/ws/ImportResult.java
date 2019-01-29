@@ -16,6 +16,7 @@ import nl.futureedge.sonar.plugin.issueresolver.issues.IssueKeyExtension;
 public final class ImportResult {
 
 	private boolean preview = false;
+	
 	private int nbIssues = 0;
 	private int duplicateKeys = 0;
 	private int matchedIssues = 0;
@@ -27,8 +28,16 @@ public final class ImportResult {
 	private int commentedIssues = 0;
 	private List<String> commentFailures = new ArrayList<>();
 	
+	// 25 January 2019 - temporary 
+	private boolean moreThanTenThousandIssues = false;
+	
 	// improve results -> show issues that are matching
 	private List<IssueKeyExtension> issuesKeysExtensions = new ArrayList<IssueKeyExtension>();
+	
+	// number of directories
+	private int numberOfDirectories = 0;
+	// number of issues in the target project branch
+	private int numberOfTargetIssues = 0;
 
 	public void setPreview(final boolean preview) {
 		this.preview = preview;
@@ -84,13 +93,23 @@ public final class ImportResult {
 
 	public void write(final JsonWriter writer) {
 		
+		// warning - these are keys used by the javascript in src/main/resources/static
 		writer.beginObject();
 		writer.prop("preview", preview);
 		
-		writer.prop("issues", nbIssues);
-		writer.prop("duplicateKeys", duplicateKeys);
-		writer.prop("matchedIssues", matchedIssues);
+		// number of directories in the target project branch
+		writer.prop("nbDirectories", this.numberOfDirectories);
 		
+		// number of issues read in the target project branch
+		writer.prop("targetIssues", this.numberOfTargetIssues);
+		
+		// number of issues read in JSON file or in SOURCE project branch
+		writer.prop("issues", this.nbIssues);
+		writer.prop("duplicateKeys", this.duplicateKeys);
+		writer.prop("matchedIssues", this.matchedIssues);
+		writer.prop("tenThousand", this.moreThanTenThousandIssues);
+		
+		// name of the key followed by an array
 		writer.name("matchFailures");
 		writer.beginArray();
 		writer.values(matchFailures);
@@ -126,7 +145,7 @@ public final class ImportResult {
 		while(iter.hasNext()) {
 			writer.beginObject();
 			IssueKeyExtension issueKey = iter.next();
-			issueKey.write(writer);
+			issueKey.write(writer, true);
 			writer.endObject();
 		}
 		writer.endArray();
@@ -134,8 +153,21 @@ public final class ImportResult {
 		writer.endObject();
 	}
 
-	public void recordToBeModifiedIssue(IssueKeyExtension issueKey) {
-		// TODO Auto-generated method stub
-		issuesKeysExtensions.add(issueKey);
+	public void recordToBeModifiedIssue(final IssueKeyExtension issueKey) {
+		this.issuesKeysExtensions.add(issueKey);
+	}
+
+	public void recordMoreThanTenThousandIssues(final boolean moreThanTenThousandIssues) {
+		this.moreThanTenThousandIssues = moreThanTenThousandIssues;
+		
+	}
+
+	public void setNumberOfDirectories(int size) {
+		this.numberOfDirectories = size;
+		
+	}
+
+	public void recordNumberOfTargetIssues(int issuesCount) {
+		this.numberOfTargetIssues = issuesCount;		
 	}
 }

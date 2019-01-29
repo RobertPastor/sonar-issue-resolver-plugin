@@ -9,7 +9,7 @@ define(['dom', 'result'], function(dom, result) {
 
 					// Header and description
 					//dom.createElement(parent, 'h2', { className: 'issueresolver-header', textContent: 'Update'});
-					dom.createElement(parent, 'h2', { className: 'issueresolver-description big-spacer-bottom', textContent: 'Update issues in a current project branch from issue data of a read-only source project branch.'});
+					dom.createElement(parent, 'h3', { className: 'issueresolver-description big-spacer-bottom', textContent: 'Update issues in a current project branch from issue data of a read-only source project branch.'});
 
 					// Update - form
 					var formUpdate = dom.createElement(parent, 'form', { id: 'issueresolver-update-form' , 'enctype': 'application/x-www-form-urlencoded' });
@@ -123,31 +123,8 @@ define(['dom', 'result'], function(dom, result) {
 						});
 					};
 
-					// Update - form - preview (checkbox, optional)
-					var formUpdatePreview = dom.createElement(formUpdate, 'div', { className: 'modal-field' });				
-					var formUpdatePreviewLabel = dom.createElement(formUpdatePreview, 'label', { for: 'issueresolver-update-preview' });
-					formUpdatePreviewLabel.appendChild(document.createTextNode('Preview'));
-					dom.createElement(formUpdatePreview, 'input', { id: 'issueresolver-update-preview', type: 'checkbox', name: 'preview', value: 'true'});
-					dom.createElement(formUpdatePreview, 'div', { className: 'modal-field-description', textContent: 'If set, issues are not actually resolved, but only matched and checked, no changes are made' });
-
-					// Update - form - skipAssign (checkbox, optional)
-					var formUpdateSkipAssign = dom.createElement(formUpdate, 'div', { className: 'modal-field' });				
-					var formUpdateSkipAssignLabel = dom.createElement(formUpdateSkipAssign, 'label', { for: 'issueresolver-update-skipassign' });
-					formUpdateSkipAssignLabel.appendChild(document.createTextNode('Skip assignments'));
-					dom.createElement(formUpdateSkipAssign, 'input', { id: 'issueresolver-update-skipassign', type: 'checkbox', name: 'skipAssign', value: 'true'});
-					dom.createElement(formUpdateSkipAssign, 'div', { className: 'modal-field-description', textContent: 'If set, issue assignments are skipped' });
-
-					// Update - form - skipComments (checkbox, optional)
-					var formUpdateSkipComments = dom.createElement(formUpdate, 'div', { className: 'modal-field' });				
-					var formUpdateSkipCommentsLabel = dom.createElement(formUpdateSkipComments, 'label', { for: 'issueresolver-update-skipcomments' });
-					formUpdateSkipCommentsLabel.appendChild(document.createTextNode('Skip comments'));
-					dom.createElement(formUpdateSkipComments, 'input', { id: 'issueresolver-update-skipcomments', type: 'checkbox', name: 'skipComments', value: 'true'});
-					dom.createElement(formUpdateSkipComments, 'div', { className: 'modal-field-description', textContent: 'If set, issue comments are skipped' });
-
-					// internet explorer BUG add a last checked check-box 
-					dom.createElement(formUpdate, 'input', { id: 'issueresolver-update-internet-explorer-workaround', type: 'checkbox', name: 'dontCare', value: 'true'});
-					document.getElementById('issueresolver-update-internet-explorer-workaround').checked = true;
-					document.getElementById('issueresolver-update-internet-explorer-workaround').style.display = "none";
+					// create the three check boxes as inputs to be sent to the server (plugin)
+					dom.createCheckBoxes( formUpdate );
 
 					// wait until dynamic elements are created
 					setTimeout( function() {
@@ -163,6 +140,9 @@ define(['dom', 'result'], function(dom, result) {
 
 						// Update - form - onsubmit
 						formUpdate.onsubmit = function() {
+							
+							// memorize start date
+							var startDate = new Date();
 							
 							// erase previous results
 							dom.removeChildren(divUpdateResult);
@@ -189,7 +169,7 @@ define(['dom', 'result'], function(dom, result) {
 									
 								} else {
 									
-									divUpdateResult.appendChild(result.formatResult('Update', response));
+									divUpdateResult.appendChild( result.formatResult('Update', response, startDate));
 									divUpdateResult.style.display='block';
 									formUpdateButtonButton.disabled=false;
 								}
@@ -198,7 +178,7 @@ define(['dom', 'result'], function(dom, result) {
 								
 								dom.stopProgressWorker();
 
-								divUpdateResult.appendChild(result.formatError('Update', error));
+								divUpdateResult.appendChild( result.formatError('Update', error) );
 								divUpdateResult.style.display='block';
 								formUpdateButtonButton.disabled=false;
 
@@ -264,7 +244,7 @@ define(['dom', 'result'], function(dom, result) {
 
 								var errorMessage = 'status: ' + error.response.status + ' - text: ' + error.response.statusText;
 								alert(errorMessage);
-								divUpdateResult.appendChild(document.createTextNode(errorMessage));
+								divUpdateResult.appendChild( document.createTextNode(errorMessage) );
 								divUpdateResult.style.display='block';
 
 							});
@@ -272,7 +252,7 @@ define(['dom', 'result'], function(dom, result) {
 						}).catch(function(error) {
 
 							console.log(String(error));
-							divUpdateResult.appendChild(result.formatError('Update', error.response.status));
+							divUpdateResult.appendChild( result.formatError('Update', error.response.status) );
 							divUpdateResult.style.display='block';
 							formUpdateButtonButton.disabled=false;
 
@@ -306,7 +286,7 @@ define(['dom', 'result'], function(dom, result) {
 
 							var errorMessage = 'status: ' + error.response.status + ' - text: ' + error.response.statusText;
 							alert(errorMessage);
-							divUpdateResult.appendChild(document.createTextNode(errorMessage));
+							divUpdateResult.appendChild( document.createTextNode(errorMessage) );
 							divUpdateResult.style.display='block';
 
 						});

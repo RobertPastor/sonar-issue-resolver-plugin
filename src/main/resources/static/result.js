@@ -1,5 +1,6 @@
 define(['dom'], function(dom) {
 	return {
+		
 		formatFailures: function(type, failures) {
 			
 			var divFailures = document.createElement('div');
@@ -33,11 +34,36 @@ define(['dom'], function(dom) {
 			return result;
 		},
 		
-		formatIssues: function(type, response) {
+		formatIssues: function(type, response, startDate) {
+			
+			// show start date 
+			var resultText = ("0" + startDate.getHours()).slice(-2) + ":"  
+	            + ("0" + startDate.getMinutes()).slice(-2) + "." 
+	            + ("0" + startDate.getSeconds()).slice(-2) + " -> ";
+			
+			// show current date
 			var currentDate = new Date();
-			var resultText = ("0" + currentDate.getHours()).slice(-2) + ":"  
+			resultText = resultText + ("0" + currentDate.getHours()).slice(-2) + ":"  
 	            + ("0" + currentDate.getMinutes()).slice(-2) + "." 
 	            + ("0" + currentDate.getSeconds()).slice(-2) + " - " + type + " succeeded";
+				
+			// number of directories
+			if ( response.hasOwnProperty("nbDirectories") ) {
+				resultText = resultText + "; ";
+				resultText = resultText + String(response.nbDirectories) + " directories" ;
+			}
+			
+			// number of issues in the target project branch
+			if ( response.hasOwnProperty("targetIssues") ) {
+				resultText = resultText + "; ";
+				resultText = resultText + String(response.targetIssues) + " target issues" ;
+			}
+				
+			// Warning - target project branch has more than 10K issues (split in directory not sufficient)
+			if (response.hasOwnProperty("tenThousand") && (response.tenThousand === true)) {
+				resultText = resultText + "; ";
+				resultText = resultText + "Warning >> 10K issues";
+			}
 	            
 	        // Issues
 	        resultText = resultText + "; "
@@ -102,6 +128,7 @@ define(['dom'], function(dom) {
 				  divHead = dom.createElement(tdHeader, 'div', { className: 'feature-description', textContent: head });
 				  divHead.style.fontSize = textSize;
 				  divHead.style.fontWeight = 'bold';
+				  divHead.style.textAlign = 'center';
 				  
 			});
 			
@@ -122,8 +149,10 @@ define(['dom'], function(dom) {
 					td = dom.createElement(tr, 'td',{});
 					td.style.border = "thin dotted blue";
 
-					dom.createElement(td, 'div', { className: 'feature-description', textContent: (index).toString() });
+					var divRowCount = dom.createElement(td, 'div', { className: 'feature-description', textContent: (index).toString() });
 					//divIssueIndex.style.border = 'thin dotted blue';
+					divRowCount.style.textAlign = 'center';
+					
 					index = index + 1;
 					
 					first = false;
@@ -159,11 +188,11 @@ define(['dom'], function(dom) {
 			
 		},
 		
-		formatResult: function (type, response) {
+		formatResult: function (type, response, startDate) {
 	        var divResult = document.createElement('div');
 
 	        // Base result
-			var baseResult = this.formatIssues(type, response);
+			var baseResult = this.formatIssues(type, response, startDate);
 	        dom.createElement(divResult, 'span', { style: 'font-weight:bold;', textContent: baseResult });
 	        
 	        // Match failures

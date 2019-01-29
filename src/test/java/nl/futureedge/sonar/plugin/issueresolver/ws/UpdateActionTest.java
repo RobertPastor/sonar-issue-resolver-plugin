@@ -12,12 +12,15 @@ import org.sonarqube.ws.Common;
 import org.sonarqube.ws.Common.Severity;
 import org.sonarqube.ws.Issues;
 
+import org.sonarqube.ws.WsMeasures;
+
 public class UpdateActionTest {
 	
 	private static final Logger LOGGER = Loggers.get(UpdateActionTest.class);
 
 	@Test
 	public void test() throws IOException {
+		
 		// Request
 		final MockRequest request = new MockRequest();
 		request.setParam("fromProjectKey", "base-project-key");
@@ -42,11 +45,11 @@ public class UpdateActionTest {
 		localRequestBaseParamsToCheckPageOne.put("ps", "100");
 
 		final Issues.SearchWsResponse.Builder localRequestBaseResponsePageOne = Issues.SearchWsResponse.newBuilder();
-		localRequestBaseResponsePageOne
-		.setPaging(Common.Paging.newBuilder().setTotal(3).setPageIndex(1).setPageSize(2));
+		// total of 3 issues , page size = 2 issues , current page index = 1
+		localRequestBaseResponsePageOne.setPaging(Common.Paging.newBuilder().setTotal(3).setPageIndex(1).setPageSize(2));
 
 		localRequestBaseResponsePageOne
-		.addIssues(Issues.Issue.newBuilder()
+			.addIssues(Issues.Issue.newBuilder()
 				.setKey("AVrdUwSCGyMCMhQpQjBw")
 				.setRule("xml:IllegalTabCheck")
 				.setComponent("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:pom.xml")
@@ -59,7 +62,7 @@ public class UpdateActionTest {
 				.setSeverity(Severity.INFO)	);
 
 		localRequestBaseResponsePageOne
-		.addIssues(Issues.Issue.newBuilder()
+			.addIssues(Issues.Issue.newBuilder()
 				.setKey("AVrdUwSCGyMCMhQpQjBq")
 				.setRule("xml:IllegalTabCheck")
 				.setComponent("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:pom.xml")
@@ -73,8 +76,24 @@ public class UpdateActionTest {
 
 		localRequestBaseResponsePageOne.addComponents(Issues.Component.newBuilder()
 				.setKey("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:pom.xml").setLongName("pom.xml"));
+		
 		request.mockLocalRequest("api/issues/search", localRequestBaseParamsToCheckPageOne,
 				localRequestBaseResponsePageOne.build().toByteArray());
+		
+		//================================================
+		
+		final Map<String, String> localRequestBaseParamsToCheckPageOneBis = new HashMap<>();
+		localRequestBaseParamsToCheckPageOneBis.put("component", "my-project-key");
+		localRequestBaseParamsToCheckPageOneBis.put("metricKeys", "violations");
+		localRequestBaseParamsToCheckPageOneBis.put("qualifiers", "DIR");
+		
+		final WsMeasures.ComponentTreeWsResponse.Builder localRequestBaseResponsePageOneBis = WsMeasures.ComponentTreeWsResponse.newBuilder() ;
+		localRequestBaseResponsePageOneBis.addComponents(WsMeasures.Component.newBuilder().setKey("component"));
+		
+		request.mockLocalRequest("api/measures/component_tree" , localRequestBaseParamsToCheckPageOneBis, 
+				localRequestBaseResponsePageOneBis.build().toByteArray());
+		
+		//================================================
 
 		// Local call (second page)
 		final Map<String, String> localRequestBaseParamsToCheckPageTwo = new HashMap<>();
@@ -89,11 +108,10 @@ public class UpdateActionTest {
 
 		final Issues.SearchWsResponse.Builder localRequestBaseResponsePageTwo = Issues.SearchWsResponse.newBuilder();
 
-		localRequestBaseResponsePageTwo
-		.setPaging(Common.Paging.newBuilder().setTotal(3).setPageIndex(2).setPageSize(2));
+		localRequestBaseResponsePageTwo.setPaging(Common.Paging.newBuilder().setTotal(3).setPageIndex(2).setPageSize(2));
 
 		localRequestBaseResponsePageTwo
-		.addIssues(Issues.Issue.newBuilder()
+			.addIssues(Issues.Issue.newBuilder()
 				.setKey("AVrdUwS9GyMCMhQpQjBx")
 				.setRule("squid:S3776")
 				.setComponent("nl.future-edge.sonarqube.plugins:sonar-issueresolver-plugin:src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java")
@@ -205,16 +223,18 @@ public class UpdateActionTest {
 
 		// Validate
 		final String result = new String(response.result(), "UTF-8");
-		Assert.assertEquals("{" + "\"preview\":false,\"issues\":3,\"duplicateKeys\":0,"
-				+ "\"matchedIssues\":2,\"matchFailures\":[]," + "\"transitionedIssues\":1,\"transitionFailures\":[],"
+		Assert.assertEquals(
+				"{" 
+				+ "\"preview\":false,\"nbDirectories\":1,\"targetIssues\":3,\"issues\":3,\"duplicateKeys\":0,"
+				+ "\"matchedIssues\":2,\"tenThousand\":false,\"matchFailures\":[]," + "\"transitionedIssues\":1,\"transitionFailures\":[],"
 				+ "\"assignedIssues\":0,\"assignFailures\":[]," + "\"commentedIssues\":0,\"commentFailures\":[],"
 				// 18 January 2019 - add matching issues
 				+ "\"matchingIssues\":[" 
-				+ "{\"longName\":\"pom.xml\",\"rule\":\"xml:IllegalTabCheck\",\"line\":0,\"hash\":\"hash\",\"message\":\"message\","
+				+ "{\"longName\":\"pom.xml\",\"rule\":\"xml:IllegalTabCheck\",\"line\":4,\"hash\":\"hash\",\"message\":\"message\","
 				+ "\"status\":\"RESOLVED\",\"resolution\":\"FALSE-POSITIVE\",\"severity\":\"INFO\","
 				+ "\"transitioned\":false,\"assigned\":false,\"commented\":false"
 				+ "},"
-				+ "{\"longName\":\"src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java\",\"rule\":\"squid:S3776\",\"line\":0,\"hash\":\"hash\",\"message\":\"message\","
+				+ "{\"longName\":\"src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java\",\"rule\":\"squid:S3776\",\"line\":64,\"hash\":\"hash\",\"message\":\"message\","
 				+ "\"status\":\"OPEN\",\"resolution\":\"\",\"severity\":\"INFO\","
 				+ "\"transitioned\":true,\"assigned\":false,\"commented\":false"
 				+ "}"

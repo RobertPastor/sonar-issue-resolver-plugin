@@ -17,7 +17,7 @@ import org.sonarqube.ws.Issues.Issue;
 
 import nl.futureedge.sonar.plugin.issueresolver.json.JsonReader;
 
-public class IssueKeyTest {
+public class IssueKeyExtensionTest {
 	
 	private static final Logger LOGGER = Loggers.get(IssueKeyTest.class);
 
@@ -34,7 +34,7 @@ public class IssueKeyTest {
 		
 		final List<Component> components = Arrays.asList(component);
 
-		final IssueKey key = IssueKey.fromIssue(issue, components);
+		final IssueKeyExtension key = IssueKeyExtension.fromIssue(issue, components);
 
 		final String json;
 		try (final StringWriter writer = new StringWriter()) {
@@ -42,7 +42,7 @@ public class IssueKeyTest {
 			
 			jsonWriter.beginObject();
 			// Issue Key is writing file Path, rule, line, hash and message
-			key.write(jsonWriter);
+			key.write(jsonWriter, false);
 			jsonWriter.endObject();
 			jsonWriter.close();
 
@@ -52,24 +52,24 @@ public class IssueKeyTest {
 		LOGGER.info(json);
 		
 		Assert.assertEquals(
-				"{\"longName\":\"src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java\",\"rule\":\"test:rule001\",\"line\":13,\"hash\":\"hash\",\"message\":\"message\"}",
+				"{\"longName\":\"src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java\","
+				+ "\"rule\":\"test:rule001\",\"line\":13,\"hash\":\"hash\",\"message\":\"message\","
+				+ "\"status\":\"\",\"resolution\":\"\",\"severity\":\"INFO\""
+				+ "}",
 				json);
 
 		LOGGER.info("json is as expected");
 		
-		final IssueKey readKey;
+		final IssueKeyExtension readKey;
 		try (final ByteArrayInputStream bais = new ByteArrayInputStream(json.getBytes("UTF-8"));
 				final JsonReader reader = new JsonReader(bais)) {
 			reader.beginObject();
-			readKey = IssueKey.read(reader);
+			readKey = IssueKeyExtension.read(reader);
 			reader.endObject();
 		}
 
 		Assert.assertTrue("same hash code", (key.hashCode() == readKey.hashCode()) );
 		LOGGER.info("same hash code");
-		
-		//Assert.assertTrue("same keys" , key == readKey);
-		//LOGGER.info("same keys");
 
 		Assert.assertFalse("key is not null" , key.equals(null));
 		LOGGER.info("key is not null");

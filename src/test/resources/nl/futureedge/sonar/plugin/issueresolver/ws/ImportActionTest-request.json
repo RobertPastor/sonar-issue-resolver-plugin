@@ -7,131 +7,156 @@
 	{ // MATCHED ISSUE (NO ACTION; ASSIGN)
 		"longName": "pom.xml",
 		"rule": "xml:IllegalTabCheck",
+		"line": 4,
 		"hash": "hash0",
+		"message": "message",
+		
 		"status": "RESOLVED",
 		"resolution": "FALSE-POSITIVE",
-		"assignee": "admin",
-		"line": 4,
-		"message": "message",
-		"creationDate": "14/01/2019",
 		"severity": "INFO",
-		"comments": []
+		
+		"assignee": "admin",
+		"creationDate": "14/01/2019",
+		"comments": ["Comment one"]
 	},
 	{ // DUPLICATE KEY
 		"longName": "pom.xml",
 		"rule": "xml:IllegalTabCheck",
+		"line": 4,
 		"hash": "hash0",
+		"message": "message",
+		
 		"status": "RESOLVED",
 		"resolution": "FALSE-POSITIVE",
-		"assignee": "",
-		"line": 4,
-		"message": "message",
-		"creationDate": "14/01/2019",
 		"severity": "INFO",
+		
+		"assignee": "",
+		"creationDate": "14/01/2019",
+		
 		"comments": []
 	},
 	{ // UNMATCHED ISSUE
 		"longName": "pom.xml",
 		"rule": "xml:IllegalTabCheck",
+		"line": 7,
 		"hash": "hash1",
+		"message": "message",
+		
 		"status": "RESOLVED",
 		"resolution": "FALSE-POSITIVE",
-		"assignee": "",
-		"line": 7,
-		"message": "message",
-		"creationDate": "14/01/2019",
 		"severity": "INFO",
-		"comments": []
+		
+		"assignee": "",
+		"creationDate": "14/01/2019",
+		"comments": ["Comment one"]
 	},
 	{ // MATCHED ISSUE (CONFIRM; NO ASSIGN)
 		"longName": "src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java",
 		"rule": "squid:S3776",
+		"line": 55,
+		
 		"hash": "hash2",
+		"message": "message",
+		
 		"status": "CONFIRMED",
 		"resolution": "",
-		"assignee": "admin",
-		"line": 55,
-		"message": "message",
-		"creationDate": "14/01/2019",
 		"severity": "INFO",
+		
+		"assignee": "admin",
+		"creationDate": "14/01/2019",
 		"comments": []
 	},
 	{ // MATCHED ISSUE (UNCONFIRM; REASSIGN)
 		"longName": "src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java",
 		"rule": "squid:S3776",
+		"line": 56,
 		"hash": "hash3",
+		"message": "message",
+		
 		"status": "REOPENED",
 		"resolution": "",
-		"assignee": "unknown",
-		"line": 56,
-		"message": "message",
-		"creationDate": "14/01/2019",
 		"severity": "INFO",
+		
+		"assignee": "unknown",
+		"creationDate": "14/01/2019",
 		"comments": []
 	},
 	{ // MATCHED ISSUE (REOPEN)
 		"longName": "src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java",
 		"rule": "squid:S3776",
+		"line": 57,
 		"hash": "hash4",
+		"message": "message",
+		
 		"status": "REOPENED",
 		"resolution": "",
-		"assignee": "",
-		"line": 57,
-		"message": "message",
-		"creationDate": "14/01/2019",
 		"severity": "INFO",
+		
+		"assignee": "",
+		"creationDate": "14/01/2019",
 		"comments": []
 	},
 	{ // MATCHED ISSUE (RESOLVED FIXED)
 		"longName": "src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java",
 		"rule": "squid:S3776",
+		"line": 58,
 		"hash": "hash5",
+		"message": "message",
+		
 		"status": "RESOLVED",
 		"resolution": "FIXED",
-		"assignee": "",
-		"line": 58,
-		"message": "message",
-		"creationDate": "14/01/2019",
 		"severity": "INFO",
+		
+		"assignee": "",
+		"creationDate": "14/01/2019",
 		"comments": []
 	},
 	{ // MATCHED ISSUE (RESOLVED FALSE-POSITIVE)
 		"longName": "src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java",
 		"rule": "squid:S3776",
+		"line": 59,
+		
 		"hash": "hash6",
+		"message": "message",
+		
 		"status": "RESOLVED",
 		"resolution": "FALSE-POSITIVE",
-		"assignee": "",
-		"line": 59,
-		"message": "message",
-		"creationDate": "14/01/2019",
 		"severity": "INFO",
+		
+		"assignee": "",
+		"creationDate": "14/01/2019",
 		"comments": []
 	},
 	{ // MATCHED ISSUE (RESOLVED WONTFIX; ADD COMMENT)
 		"longName": "src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java",
 		"rule": "squid:S3776",
+		"line": 60,
+		
 		"hash": "hash7",
+		"message": "message",
+		
 		"status": "RESOLVED",
 		"resolution": "WONTFIX",
-		"assignee": "",
-		"line": 60,
-		"message": "message",
-		"creationDate": "14/01/2019",
 		"severity": "INFO",
+		
+		"assignee": "",
+		"creationDate": "14/01/2019",
 		"comments": ["Comment one","Comment two","Comment three"]
 	},
 	{ // MATCHED ISSUE (MATCH FAILURE)
 		"longName": "src/main/java/nl/futureedge/sonar/plugin/issueresolver/issues/IssueKey.java",
 		"rule": "squid:S3776",
+		"line": 61,
+		
 		"hash": "hash8",
+		"message": "message",
+		
 		"status": "RESOLVED",
 		"resolution": "FALSE-POSITIVE",
-		"assignee": "",
-		"line": 61,
-		"message": "message",
-		"creationDate": "14/01/2019",
 		"severity": "INFO",
+		
+		"assignee": "",
+		"creationDate": "14/01/2019",
 		"comments": []
 	}
 	]

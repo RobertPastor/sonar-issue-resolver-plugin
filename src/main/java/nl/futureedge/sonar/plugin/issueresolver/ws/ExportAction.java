@@ -19,8 +19,10 @@ import nl.futureedge.sonar.plugin.issueresolver.helper.IssueHelper;
 import nl.futureedge.sonar.plugin.issueresolver.helper.SearchHelper;
 import nl.futureedge.sonar.plugin.issueresolver.issues.IssueData;
 import nl.futureedge.sonar.plugin.issueresolver.issues.IssueKey;
+import nl.futureedge.sonar.plugin.issueresolver.issues.IssueKeyExtension;
 
-
+import java.util.Calendar;
+import java.util.TimeZone;
 
 /**
  * Export action.
@@ -41,11 +43,43 @@ public class ExportAction implements IssueResolverWsAction {
         char chars[] = str.toCharArray();
 
         for (int i = 0; i < chars.length; i++) {
-            if ((65 <= chars[i] && chars[i] <= 90) || (97 <= chars[i] && chars[i] <= 122)) {
+        	// keep only digit 0..9 && A-Z && a-z
+            if ( (48 <= chars[i] && chars[i] <= 57)  || (65 <= chars[i] && chars[i] <= 90) || (97 <= chars[i] && chars[i] <= 122)) {
                 buff.append(chars[i]);
+            } else {
+            	buff.append("-");
             }
         }
         return buff.toString();
+	}
+	
+	
+	public static String getCurrentDateTime() {
+
+		Calendar cal = Calendar.getInstance(TimeZone.getDefault()); 
+		String DATE_FORMAT = "dd-MMMM-yyyy-HH-mm"; 
+		java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat(DATE_FORMAT);
+		sdf.setTimeZone(TimeZone.getDefault()); 
+		String currentTime = sdf.format(cal.getTime());
+		int lastDashIndex = currentTime.lastIndexOf("-");
+		
+		String finaliseCurrentTime = currentTime.substring(0, lastDashIndex);
+		//LOGGER.info(finaliseCurrentTime);
+		finaliseCurrentTime = finaliseCurrentTime + "h";
+		//LOGGER.info(finaliseCurrentTime);
+		finaliseCurrentTime = finaliseCurrentTime + currentTime.substring(lastDashIndex+1);
+		//LOGGER.info(finaliseCurrentTime);
+		return finaliseCurrentTime;
+
+	}
+	
+	private static String cleanMultipleDashes(String input) {
+		
+		String output = input;
+		while (output.contains("--")) {
+			output = output.replaceAll("--", "-");
+		}
+		return output;
 	}
 
 
@@ -72,15 +106,23 @@ public class ExportAction implements IssueResolverWsAction {
 	public void handle(final Request request, final Response response) {
 		
 		LOGGER.debug("Handle issueresolver export request");
+		
 		String fileName = stripNonAscii(request.mandatoryParam(PARAM_PROJECT_KEY));
+		fileName += '-' + stripNonAscii(request.mandatoryParam(PARAM_BRANCH));
+		fileName += "-" + getCurrentDateTime();
+		fileName = cleanMultipleDashes(fileName);
+		fileName = fileName + ".json";
+		
 		LOGGER.info("file Name= " + fileName);
 		
 		// header of the response
-		response.setHeader("Content-Disposition", "attachment; filename=\"resolved-issues.json\"");
+		//response.setHeader("Content-Disposition", "attachment; filename=\"resolved-issues.json\"");
+		response.setHeader("Content-Disposition", "attachment; filename=" + fileName );
 
 		try {
 			
 			JsonWriter responseWriter = response.newJsonWriter();
+			
 			// see tabExport.js - project key and branch parameters are always provided.
 			writeStart(responseWriter, request.mandatoryParam(PARAM_PROJECT_KEY), request.mandatoryParam(PARAM_BRANCH));
 			
@@ -90,6 +132,7 @@ public class ExportAction implements IssueResolverWsAction {
 			IssueHelper.forEachIssue(request.localConnector(),
 						SearchHelper.findIssuesForExport(request.mandatoryParam(PARAM_PROJECT_KEY) , request.mandatoryParam(PARAM_BRANCH) ), (searchIssuesResponse,
 								issue) -> writeIssue(responseWriter, issue, searchIssuesResponse.getComponentsList()));
+			
 			
 			// finish the JSON object
 			writeEnd(responseWriter);
@@ -121,6 +164,7 @@ public class ExportAction implements IssueResolverWsAction {
 	private void writeStart(final JsonWriter writer, String projectKey, String projectBranch) {
 		
 		writer.beginObject();
+		
 		writer.prop("version", 1);
 		writer.prop("projectKey", projectKey);
 		DateFormat df = new SimpleDateFormat("dd/MM/yyyy HH:mm");
@@ -134,6 +178,7 @@ public class ExportAction implements IssueResolverWsAction {
 	}
 
 	private void writeIssue(final JsonWriter writer, final Issue issue, List<Component> components) {
+		
 		writer.beginObject();
 
 		final IssueKey key = IssueKey.fromIssue(issue, components);

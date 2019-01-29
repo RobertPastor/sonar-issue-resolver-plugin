@@ -16,57 +16,51 @@ import nl.futureedge.sonar.plugin.issueresolver.json.JsonReader;
  */
 public final class IssueData {
 
+
 	private static final String NAME_STATUS = "status";
 	private static final String NAME_RESOLUTION = "resolution";
-	private static final String NAME_ASSIGNEE = "assignee";
-	private static final String NAME_COMMENTS = "comments";
-	// 14th January 2019 - use line
-	//private static final String NAME_LINE = "line";
-	//private static final String NAME_MESSAGE = "message";
-	private static final String NAME_CREATION_DATE = "creationDate";
 	private static final String NAME_SEVERITY = "severity";
+
+	private static final String NAME_ASSIGNEE = "assignee";
+	private static final String NAME_CREATION_DATE = "creationDate";
+	private static final String NAME_COMMENTS = "comments";
 
 	private final String status;
 	private final String resolution;
-	private final String assignee;
-	// line is moved from Issue key to Issue Data
-	//private final int line;
-	//private final String message;
-	private final String creationDate;
 	private final Severity severity;
-	
+
+	private final String assignee;
+	private final String creationDate;
 	private final List<String> comments;
 
+	
+	public String toString() {
+		
+		return NAME_STATUS + " - " + this.status + " - " + NAME_RESOLUTION + " - " + this.resolution;
+	}
 	/**
 	 * Constructor.
 	 * 
-	 * @param status
-	 *            status
-	 * @param resolution
-	 *            resolution
+
 	 * @param assignee
 	 *            assignee
-	 
+
 	 * @param creationDate
 	 * 			  creationDate
-	 * @param severity
-	 * 			  severity
+
 	 * @param comments
 	 *            comments
 	 */
-	private IssueData(final String status, final String resolution, final String assignee, 
-		    final String creationDate, final Severity severity,
+	private IssueData(final String status, final String resolution, final Severity severity, final String assignee, 
+			final String creationDate, 
 			final List<String> comments) {
-		
+
 		this.status = status;
 		this.resolution = resolution;
-		this.assignee = assignee;
-		// 21st January 2019 -  line and message moved to IssueKey
-		//this.line = line;
-		//this.message = message;
-		this.creationDate = creationDate;
 		this.severity = severity;
-		
+
+		this.assignee = assignee;
+		this.creationDate = creationDate;
 		this.comments = comments;
 	}
 
@@ -80,15 +74,15 @@ public final class IssueData {
 	 * @return issue data
 	 */
 	public static IssueData fromIssue(final Issue issue) {
-		
+
 		final List<String> comments = new ArrayList<>();
-		
+
 		for (final Comment comment : issue.getComments().getCommentsList()) {
 			comments.add(comment.getMarkdown());
 		}
 
-		return new IssueData(issue.getStatus(), issue.getResolution(), issue.getAssignee(), 
-				issue.getCreationDate(), issue.getSeverity(),
+		return new IssueData( issue.getStatus(), issue.getResolution(), issue.getSeverity(), issue.getAssignee(), 
+				issue.getCreationDate(), 
 				comments);
 	}
 
@@ -102,10 +96,17 @@ public final class IssueData {
 	 *             IO errors in underlying json reader
 	 */
 	public static IssueData read(final JsonReader reader) throws IOException {
-		
+
 		// 21st January 2019 - line and message are moved to IssueKey
-		return new IssueData(reader.prop(NAME_STATUS), reader.prop(NAME_RESOLUTION), reader.prop(NAME_ASSIGNEE), reader.prop(NAME_CREATION_DATE), Severity.valueOf(reader.prop(NAME_SEVERITY)),
-				reader.propValues(NAME_COMMENTS));
+		return new IssueData(
+				reader.prop(NAME_STATUS), 
+				reader.prop(NAME_RESOLUTION), 
+				Severity.valueOf(reader.prop(NAME_SEVERITY)),
+				
+				reader.prop(NAME_ASSIGNEE), 
+				reader.prop(NAME_CREATION_DATE),
+				reader.propValues(NAME_COMMENTS)
+				);		
 	}
 
 	/**
@@ -115,17 +116,16 @@ public final class IssueData {
 	 *            json writer
 	 */
 	public void write(final JsonWriter writer) {
-		
+
 		writer.prop(NAME_STATUS, status);
 		writer.prop(NAME_RESOLUTION, resolution);
-		writer.prop(NAME_ASSIGNEE, assignee);
-		// 14th January 2019 - export line - hash is used in Issue Key
-		// 21st January 2019 line and message are already in the issue key
-		//writer.prop(NAME_LINE, line);
-		//writer.prop(NAME_MESSAGE, message);
-		writer.prop(NAME_CREATION_DATE, creationDate);
-		writer.prop(NAME_SEVERITY, severity.name());
+		writer.prop(NAME_SEVERITY, this.severity.name());
 
+		writer.prop(NAME_ASSIGNEE, assignee);
+		
+		writer.prop(NAME_CREATION_DATE, creationDate);
+
+		// tag name followed by an array
 		writer.name(NAME_COMMENTS);
 		writer.beginArray();
 		writer.values(comments);
@@ -140,7 +140,6 @@ public final class IssueData {
 	public String getStatus() {
 		return status;
 	}
-
 	
 	/**
 	 * Resolution.
@@ -161,16 +160,6 @@ public final class IssueData {
 	}
 
 	/**
-	 * Comments (markdown format).
-	 * 
-	 * @return list of comments
-	 */
-	public List<String> getComments() {
-		return comments;
-	}
-	
-	
-	/**
 	 * CreationDate.
 	 * 
 	 * @return CreationDate
@@ -178,14 +167,15 @@ public final class IssueData {
 	public String getCreationDate() {
 		return creationDate;
 	}
-	
+
 	/**
-	 * Severity.
+	 * Comments (markdown format).
 	 * 
-	 * @return severity
+	 * @return list of comments
 	 */
-	public Severity getSeverity() {
-		return severity;
+	public List<String> getComments() {
+		return comments;
 	}
+
 
 }

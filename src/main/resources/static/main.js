@@ -8,7 +8,7 @@ define(['dom', 'tabsFactory', 'tabUpdate', 'tabExport', 'tabImport'], function(d
 			var header = dom.createElement(options.el, 'header', { className: 'page-header'});
 			var textContent = 'Issue Resolver: allows you to synchronise issues that are resolved with false positive and won\'t fix.';
 			
-			dom.createElement(header, 'h1', { className: 'page-title', textContent: textContent});
+			dom.createElement(header, 'h3', { className: 'page-title', textContent: textContent});
 			//dom.createElement(header, 'div', { className: 'page-description', textContent: 'Allows you to synchronise issues that are resolved with false positive and won\'t fix.'});
 			
 			var tabs = tabsFactory.create(options.el);

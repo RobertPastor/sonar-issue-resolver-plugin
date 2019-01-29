@@ -153,7 +153,10 @@ define(['dom'], function(dom) {
 							// set a backgroundColor to the selected div
 							var linkArray = ['Update', 'Import', 'Export'];
 							linkArray.forEach ( function ( item ) {
-								dom.getElementById(item).style.backgroundColor = "white";
+								if ( dom.getElementById(item) ) {
+									// need to do this as the Import feature is not available in Internet Explorer
+									dom.getElementById(item).style.backgroundColor = "white";
+								}
 							} );
 							div.style.backgroundColor = "cyan";
 							thisObject.show(name);

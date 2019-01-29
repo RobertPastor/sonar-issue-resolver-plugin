@@ -81,17 +81,16 @@ public final class UpdateAction implements IssueResolverWsAction {
 		final ImportResult importResult = new ImportResult();
 		
 		// Read issues from origin project - FROM PROJECT - reference data- read-only same as JSON file in import
-		final Map<IssueKeyExtension, IssueData> issues = new HashMap<>();
+		final Map<IssueKey, IssueData> sourceIssues = new HashMap<>();
 		
 		try {
 			// Issues for export -> means read-only reference source issues (from the source project branch)
-			IssueHelper.forEachIssue(request.localConnector(),
+			boolean moreThanTenThousandIssues = IssueHelper.forEachIssue(request.localConnector(),
 					SearchHelper.findIssuesForExport(request.mandatoryParam(PARAM_FROM_PROJECT_KEY) , request.mandatoryParam(PARAM_FROM_PROJECT_BRANCH) ),
 					(searchIssuesResponse, issue) -> {
 						
 						// issues will contain reference data
-						issues.put(IssueKeyExtension.fromIssue(issue, searchIssuesResponse.getComponentsList()),
-								IssueData.fromIssue(issue));
+						sourceIssues.put(IssueKey.fromIssue(issue, searchIssuesResponse.getComponentsList()), IssueData.fromIssue(issue));
 						
 						importResult.registerIssue();
 					});
@@ -103,7 +102,7 @@ public final class UpdateAction implements IssueResolverWsAction {
 					request.mandatoryParamAsBoolean(PARAM_PREVIEW), request.mandatoryParamAsBoolean(PARAM_SKIP_ASSIGN),
 					request.mandatoryParamAsBoolean(PARAM_SKIP_COMMENTS), request.mandatoryParam(PARAM_TO_PROJECT_KEY),
 					request.mandatoryParam(PARAM_TO_PROJECT_BRANCH),
-					issues);
+					sourceIssues);
 			
 			// Sent result
 			final JsonWriter responseWriter = response.newJsonWriter();

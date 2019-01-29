@@ -9,7 +9,7 @@ define(['dom', 'result'], function(dom, result) {
 					dom.removeChildren(parent);
 					
 					//dom.createElement(parent, 'h2', { className: 'issueresolver-header', textContent: 'Import'});
-					dom.createElement(parent, 'h2', { className: 'issueresolver-description big-spacer-bottom', textContent: 'Import a datafile with issues (created using export), that will be matched to current issues using rule key, component and location.'});
+					dom.createElement(parent, 'h3', { className: 'issueresolver-description big-spacer-bottom', textContent: 'Import a JSON datafile with issues (created using export), that will be matched to current issues using rule key, component and location.'});
 					
 					// Import - form
 					var formImport = dom.createElement(parent, 'form', { id: 'issueresolver-import-form' , 'enctype': 'multipart/form-data' });
@@ -23,7 +23,7 @@ define(['dom', 'result'], function(dom, result) {
 					// Import - form - data file
 					var formImportData = dom.createElement(formImport, 'div', { className: 'modal-field'});
 					var formImportDataLabel = dom.createElement(formImportData, 'label', { for: 'issueresolver-import-data'});
-					formImportDataLabel.appendChild(document.createTextNode('Data'));
+					formImportDataLabel.appendChild(document.createTextNode('Source Data'));
 					
 					dom.createElement(formImportDataLabel, 'em', { className:'mandatory', textContent: '*'});
 					dom.createElement(formImportData, 'input', { id: 'issueresolver-import-data', type:'file', name:'data', accept: 'application/json,.json'});
@@ -53,30 +53,9 @@ define(['dom', 'result'], function(dom, result) {
 					
 					dom.createElement(formImportTargetBranch, 'div', { className:'modal-field-description', textContent: 'The target branch in the current project'});
 					
-					// Import - form - preview (checkbox, optional)
-					var formImportPreview = dom.createElement(formImport, 'div', { className: 'modal-field' });				
-					var formImportPreviewLabel = dom.createElement(formImportPreview, 'label', { for: 'issueresolver-import-preview' });
-					formImportPreviewLabel.appendChild(document.createTextNode('Preview'));
-					
-					dom.createElement(formImportPreview, 'input', { id: 'issueresolver-import-preview', type: 'checkbox', name: 'preview', value: 'true'});
-					dom.createElement(formImportPreview, 'div', { className: 'modal-field-description', textContent: 'If set, issues are not actually resolved, but only matched and checked, no changes are made' });
+					// create the three check boxes as inputs to be sent to the server (plugin)
+					dom.createCheckBoxes( formImport );
 
-					// Import - form - skipAssign (checkbox, optional)
-					var formImportSkipAssign = dom.createElement(formImport, 'div', { className: 'modal-field' });				
-					var formImportSkipAssignLabel = dom.createElement(formImportSkipAssign, 'label', { for: 'issueresolver-import-skipassign' });
-					formImportSkipAssignLabel.appendChild(document.createTextNode('Skip assignments'));
-					
-					dom.createElement(formImportSkipAssign, 'input', { id: 'issueresolver-import-skipassign', type: 'checkbox', name: 'skipAssign', value: 'true'});
-					dom.createElement(formImportSkipAssign, 'div', { className: 'modal-field-description', textContent: 'If set, issue assignments are skipped' });
-
-					// Import - form - skipComments (checkbox, optional)
-					var formImportSkipComments = dom.createElement(formImport, 'div', { className: 'modal-field' });				
-					var formImportSkipCommentsLabel = dom.createElement(formImportSkipComments, 'label', { for: 'issueresolver-import-skipcomments' });
-					formImportSkipCommentsLabel.appendChild(document.createTextNode('Skip comments'));
-					
-					dom.createElement(formImportSkipComments, 'input', { id: 'issueresolver-import-skipcomments', type: 'checkbox', name: 'skipComments', value: 'true'});
-					dom.createElement(formImportSkipComments, 'div', { className: 'modal-field-description', textContent: 'If set, issue comments are skipped' });
-				
 					// Import - form - button
 					var formImportButton = dom.createElement(formImport, 'div', { className: 'modal-field' });
 					var formImportButtonButton = dom.createElement(formImportButton, 'button', { textContent: 'Import' });
@@ -88,6 +67,9 @@ define(['dom', 'result'], function(dom, result) {
 					
 					// Import - form - onsubmit
 					formImport.onsubmit = function() {
+						
+						// memorize start date
+						var startDate = new Date();
 						
 						// erase previous results
 						dom.removeChildren(divImportResult);
@@ -115,7 +97,7 @@ define(['dom', 'result'], function(dom, result) {
 									
 								} else {
 									
-									divImportResult.appendChild(result.formatResult('Import', response));
+									divImportResult.appendChild( result.formatResult('Import', response , startDate) );
 									divImportResult.style.display='block';
 									formImportButtonButton.disabled=false;
 									
