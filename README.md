@@ -68,118 +68,10 @@ Define a SonarQube based solution capable of synchronising issues data in a targ
 
  « Le besoin est de pouvoir faire des justifications dans l&#39;outil SonarQube sur une branche et de reporter ces mêmes justifications dans une autre branche. »
 
-1.
-  1. 1.1Table Of Content
 
-1        Purpose        1
+  1. 1.1 Table Of Content
 
-1.1        Table Of Content        1
-
-1.2        Illustrations        3
-
-1.3        Definitions        3
-
-1.4        Matching Issues        3
-
-2        Introduction        3
-
-2.1        Use Cases        4
-
-3        Sonar References        4
-
-3.1        Issue Statuses        4
-
-3.2        Issue Resolutions        5
-
-3.3        Issue workflow        5
-
-4        Solution Main Services        5
-
-4.1        Export Service        5
-
-4.1.1        Export Service Data Flow        5
-
-4.1.2        Export Service Requirements        6
-
-4.2        Import Service        7
-
-4.2.1        Import Service Data Flow        7
-
-4.2.2        Import Service Requirements        7
-
-4.3        Update Service        8
-
-4.3.1        Update Service Data Flow        8
-
-4.3.2        Update Service Requirements        9
-
-4.4        Results        9
-
-4.5        Issues filtering conditions        10
-
-4.6        Issues Matching Criteria        10
-
-4.7        Issues Status Transitioning Automate        11
-
-4.7.1        Case where no transition        11
-
-4.7.2        Confirm Transition        11
-
-4.7.3        Un-confirm transition        11
-
-4.7.4        Re open transition        11
-
-4.7.5        Resolve transition        11
-
-4.7.6        Resolve False positive transition        11
-
-4.7.7        Resolve Won&#39;t fix transition        11
-
-4.7.8        All other cases        11
-
-5        Test cases        11
-
-5.1        Case where there are several issues on the same line        11
-
-5.2        Case where the issue has no line information or the line information equals zero        11
-
-5.3        Case where the code containing a violation has only been moved inside a file        12
-
-6        Appendix        12
-
-6.1        Project Branches        12
-
-6.2        Matching Strategies        13
-
-6.3        Example of JSON export        14
-
-6.4        Example of Update Results        14
-
-6.4.1        Update Results in Preview Mode        14
-
-6.5        Requirements        15
-
-1.
-  1. 1.2Illustrations
-
-Figure 1: Data Flow between Source and Target Project Branches        4
-
-Figure 2: Transition Workflow        5
-
-Figure 3: Export Service Data Flow        6
-
-Figure 4: Import Service Data Flow        7
-
-Figure 5: Update Service Data Flow        9
-
-Figure 6: Project Branches Selection        12
-
-Figure 7: JSON Exported File        14
-
-Figure 8: Update Results in Preview Mode        15
-
-1.
-  1. 1.3Definitions
+  1. 1.3 Definitions
 
 | **Definition** | **Explanations** |
 | --- | --- |
@@ -188,8 +80,8 @@ Figure 8: Update Results in Preview Mode        15
 | Issue | A violation of a rule at the specific location in a scanned code file. |
 | Justification | Justifications are rationales provided by the user to explain why an issue will not be fixed or why an issue is considered as a False-Positive. These justifications are stored in the issue attribute named &quot;comments&quot;. |
 
-1.
-  1. 1.4Matching Issues
+
+  1. 1.4 Matching Issues
 
 In order to synchronize issues there is the need to identify those issues from a target branch that are matching reference issues in a source project branch.
 
@@ -203,7 +95,7 @@ Note: The line (number) where the violation occurs must not be used as it avoids
 
 Note: The message allows differentiating several violations of the same rule (example: use of magic numbers) in the same line of the same file.
 
-1. 2Introduction
+1. 2 Introduction
 
 The service shall synchronize issue data in a **target** write-enabled project branch from issues in a **source** read-only project branch.
 
@@ -213,19 +105,19 @@ The following figure shows the update flow between source and target project bra
 
 Figure 1: Data Flow between Source and Target Project Branches
 
-1.
-  1. 2.1Use Cases
+
+  1. 2.1 Use Cases
 
 Keep resolved issues in sync between the two project branches.
 
 Note: There shall be no limitations of any kind on the type of branches, whether it is a release/feature/maintenance or master branch, whether it is a short or long lived branch. Synchronisation shall be possible between two distinct projects but also between branches of the same project.
 
-1. 3Sonar References
+1. 3 Sonar References
 
 The following sections are extracted from the SonarQube documentation and reproduced here for information.
 
-1.
-  1. 3.1Issue Statuses
+
+  1. 3.1 Issue Statuses
 
 After creation, issues flow through a lifecycle, taking on one of five possible statuses:
 
@@ -235,16 +127,16 @@ After creation, issues flow through a lifecycle, taking on one of five possible 
 - **Reopened**  - set automatically by SonarQube when a _Resolved_ issue hasn&#39;t actually been corrected
 - **Closed**  - set automatically by SonarQube for automatically created issues.
 
-1.
-  1. 3.2Issue Resolutions
+
+  1. 3.2 Issue Resolutions
 
 Resolved issues will have one of two resolutions:
 
 - **False Positive**  - set manually
 - **Won&#39;t Fix**  - set manually
 
-1.
-  1. 3.3Issue workflow
+
+  1. 3.3 Issue workflow
 
 The following figure depicts the issue workflow as extracted from the sonar source documentation.
 
@@ -252,7 +144,7 @@ The following figure depicts the issue workflow as extracted from the sonar sour
 
 Figure 2: Transition Workflow
 
-1. 4Solution Main Services
+1. 4 Solution Main Services
 
 SONAR-RESOLVER-SERVICES-001
 
@@ -260,26 +152,24 @@ Sonar Resolver Provided Services
 
 The solution shall provide following main services:
 
-1. 1)An export service shall export (in a readable format) issues that are satisfying some &quot;status&quot; conditions.
-2. 2)An import service shall import issues data from a file, identify the subset of those that are matching issues in the target project branch in order to synchronise the target issues.
-3. 3)An update service shall synchronise issues in a target project branch from matching issues in a source project branch.
+ 1)An export service shall export (in a readable format) issues that are satisfying some &quot;status&quot; conditions.
+ 2)An import service shall import issues data from a file, identify the subset of those that are matching issues in the target project branch in order to synchronise the target issues.
+ 3)An update service shall synchronise issues in a target project branch from matching issues in a source project branch.
 
-1.
-  1. 4.1Export Service
+
+  1. 4.1 Export Service
 
 This is a read-only feature. The user must have browse permissions on the project branch.
 
-1.
-  1.
-    1. 4.1.1Export Service Data Flow
+  
+    1. 4.1.1 Export Service Data Flow
 
 The following figure shows the data flow of the export service.
 
 Figure 3: Export Service Data Flow
 
-1.
-  1.
-    1. 4.1.2Export Service Requirements
+
+    1. 4.1.2 Export Service Requirements
 
 SONAR-EXPORT-SERVICE-001
 
@@ -329,17 +219,16 @@ Note:  Comments contain the rationales provided by the user to justify that an i
 
 An example of an exported JSON file content is provided in appendix.
 
-1.
-  1. 4.2Import Service
-    1. 4.2.1Import Service Data Flow
+
+  1. 4.2 Import Service
+    1. 4.2.1 Import Service Data Flow
 
 The following figure shows the data flow of the Import Service.
 
 Figure 4: Import Service Data Flow
 
-1.
-  1.
-    1. 4.2.2Import Service Requirements
+ 
+    1. 4.2.2 Import Service Requirements
 
 SONAR-IMPORT-SERVICE-001
 
@@ -347,9 +236,9 @@ Import Service – Inputs and Outputs
 
 The import service shall:
 
-1. 1)Read reference source issues contained in a JSON input file,
-2. 2)Identify the subset of issues found in the target branch that are matching the input issues
-3. 3)Update the matching issues in a the target project branch
+ 1)Read reference source issues contained in a JSON input file,
+ 2)Identify the subset of issues found in the target branch that are matching the input issues
+ 3)Update the matching issues in a the target project branch
 
 **Note** : In order to synchronise issues, the user shall have appropriate write permissions on the target project branch.
 
@@ -389,17 +278,16 @@ The results of the import shall be presented in a table that can be easily copie
 
 An example of a results table is provided in the appendix.
 
-1.
-  1. 4.3Update Service
-    1. 4.3.1Update Service Data Flow
+1
+  1. 4.3 Update Service
+    1. 4.3.1 Update Service Data Flow
 
 The following figure shows the data flow of the update service.
 
 Figure 5: Update Service Data Flow
 
-1.
-  1.
-    1. 4.3.2Update Service Requirements
+  
+    1. 4.3.2 Update Service Requirements
 
 SONAR-UPDATE-SERVICE-001
 
@@ -427,8 +315,8 @@ Update Service – Results Format
 
 The update results shall be presented in a table that can be easily exported in an EXCEL file.
 
-1.
-  1. 4.4Results
+
+  1. 4.4 Results
 
 This section defines the results that shall be presented to the user.
 
@@ -445,8 +333,8 @@ Results shall detail:
 
 An example of results is provided in the Appendix.
 
-1.
-  1. 4.5Issues filtering conditions
+
+  1. 4.5 Issues filtering conditions
 
 SONAR-UPDATE-FILTERING-001
 
@@ -460,8 +348,8 @@ Filtering criteria are a set of conditions to consider issues from a **source** 
 
 Note: When analysing a target project branch, all issues are considered without any status condition.
 
-1.
-  1. 4.6Issues Matching Criteria
+
+  1. 4.6 Issues Matching Criteria
 
 Matching criteria are a set of conditions to consider a source reference issue matching a &quot;to be synchronised&quot; issue of a target project branch.
 
@@ -473,10 +361,10 @@ Update Service – Matching Conditions
 
 Any source issue shall be matching a target issue when the following conditions are satisfied:
 
-1. 1)Same Component i.e. same file path,
-2. 2)same rule id,
-3. 3)same line
-4. 4)same message
+ 1)Same Component i.e. same file path,
+ 2)same rule id,
+ 3)same line
+ 4)same message
 
 SONAR-UPDATE-SYNC-001
 
@@ -489,8 +377,8 @@ The following modifications shall be applied to the target issue:
 - Source assignee is assigned only if the target issue is not yet assigned
 - Any comment from the source issue that is not already in the target issue is added to the target issue.
 
-1.
-  1. 4.7Issues Status Transitioning Automate
+
+  1. 4.7 Issues Status Transitioning Automate
 
 SONAR-UPDATE-SYNC-002
 
@@ -502,77 +390,77 @@ Current = concerns the target issue (the issue to be synchronised)
 
 Wanted = concerns the source read-only issue.
 
-1.
-  1.
-    1. 4.7.1Case where no transition
+
+  
+    1. 4.7.1 Case where no transition
 
 Current status = Reopened **AND**  Wanted status = Reopened AND Current resolution = Wanted resolution
 
-1.
-  1.
-    1. 4.7.2Confirm Transition
+
+  
+    1. 4.7.2 Confirm Transition
 
 Wanted status = confirmed **AND**  ( current status = Open **OR** current status = Reopened )
 
-1.
-  1.
-    1. 4.7.3Un-confirm transition
+
+  
+    1. 4.7.3 Un-confirm transition
 
 Wanted status = Reopened **AND**  current status = Confirmed
 
-1.
-  1.
-    1. 4.7.4Re open transition
+
+  
+    1. 4.7.4 Re open transition
 
 Wanted status = Reopened **AND**  current status = Resolved
 
-1.
-  1.
-    1. 4.7.5Resolve transition
+
+  
+    1. 4.7.5 Resolve transition
 
 Wanted status = Resolved **AND**  ( Current Status = OPEN   **OR** Current status = reopened   **OR** current status = Confirmed)
 
-1.
-  1.
-    1. 4.7.6Resolve False positive transition
+
+  
+    1. 4.7.6 Resolve False positive transition
 
 All conditions of the resolve transition **AND**   Wanted Resolution = False positive
 
-1.
-  1.
-    1. 4.7.7Resolve Won&#39;t fix transition
+
+  
+    1. 4.7.7 Resolve Won&#39;t fix transition
 
 All conditions of resolve transition AND   Wanted Resolution = WONT\_FIX
 
-1.
-  1.
-    1. 4.7.8All other cases
+
+  
+    1. 4.7.8 All other cases
 
 An error message is returned. No transition is performed.
 
-1. 5Test cases
+1. 5 Test cases
 
 This section describes specific test cases defined following the discussion held with the sonar source support. These discussions were around the criteria to match a source and a target issue.
 
-1.
-  1. 5.1Case where there are several issues on the same line
+
+  1. 5.1 Case where there are several issues on the same line
 
 This test case is recalled here as it is one specific condition to be tested in order to report issues attributes between multiple identical issues raised on the same line.
 
 Case where there are several issues on the same line: example is when several magic numbers are used in one line: circle = 2 \* 3.14 \* radius).
 
-1.
-  1. 5.2Case where the issue has no line information or the line information equals zero
+
+  1. 5.2 Case where the issue has no line information or the line information equals zero
 
 This case is specific to issues that are applicable for a whole file.
 
-1.
-  1. 5.3Case where the code containing a violation has only been moved inside a file
+
+  1. 5.3 Case where the code containing a violation has only been moved inside a file
 
 As explained by the sonar source support, a violation hash-code is not modified if a piece of code is only moved inside a file. The sonar support also explained that the text of the code raising the violation might have more or less spaces; the hash-code of both violations would be identical.
 
-1. 6Appendix
-  1. 6.1Project Branches
+1. 6 Appendix
+  1. 6.1 Project Branches
 
 This appendix shows the answer returned by SonarQube when branches of a project are queried. This appendix shows that both &quot;master&quot;, &quot;release&quot; and &quot;short lived&quot; branches are retrieved.
 
@@ -664,8 +552,8 @@ Retrieved answer is as follows
 
 }
 
-1.
-  1. 6.2Matching Strategies
+
+  1. 6.2 Matching Strategies
 
 Suggestion formulée par le support sonar :
 
