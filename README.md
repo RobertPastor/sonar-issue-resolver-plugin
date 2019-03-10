@@ -280,7 +280,7 @@ The results of the import shall be presented in a table that can be easily copie
 
 An example of a results table is provided in the appendix.
 
-1
+
   1. 4.3 Update Service
     1. 4.3.1 Update Service Data Flow
 
@@ -328,10 +328,10 @@ Update Service – Results Content
 
 Results shall detail:
 
-1. 1)The issues that have been matched
-2. 2)The subset of the target issues that have been transitioned.
-3. 3)The subset of the target issues that have been assigned.
-4. 4)The subset of target issues whose comments were updated from the source issue comments.
+ 1)The issues that have been matched
+ 2)The subset of the target issues that have been transitioned.
+ 3)The subset of the target issues that have been assigned.
+ 4)The subset of target issues whose comments were updated from the source issue comments.
 
 An example of results is provided in the Appendix.
 
@@ -363,10 +363,10 @@ Update Service – Matching Conditions
 
 Any source issue shall be matching a target issue when the following conditions are satisfied:
 
- 1)Same Component i.e. same file path,
- 2)same rule id,
- 3)same line
- 4)same message
+ 1) Same Component i.e. same file path,
+ 2) same rule id,
+ 3) same line
+ 4) same message
 
 SONAR-UPDATE-SYNC-001
 
