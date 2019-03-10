@@ -153,7 +153,9 @@ Sonar Resolver Provided Services
 The solution shall provide following main services:
 
  1)An export service shall export (in a readable format) issues that are satisfying some &quot;status&quot; conditions.
+ 
  2)An import service shall import issues data from a file, identify the subset of those that are matching issues in the target project branch in order to synchronise the target issues.
+ 
  3)An update service shall synchronise issues in a target project branch from matching issues in a source project branch.
 
 
