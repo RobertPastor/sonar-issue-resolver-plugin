@@ -52,7 +52,7 @@
     <jdk.version>1.8</jdk.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <sonar.version>6.7</sonar.version>
+    <sonar.version>7.4</sonar.version>
     <sonar.orchestrator.version>3.13</sonar.orchestrator.version>
   </properties>
 
